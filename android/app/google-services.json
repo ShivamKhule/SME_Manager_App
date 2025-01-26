@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "860542776358",
+    "firebase_url": "https://skwebtrial-default-rtdb.firebaseio.com",
+    "project_id": "skwebtrial",
+    "storage_bucket": "skwebtrial.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860542776358:android:32bb07ca168b766b2b22e7",
+        "android_client_info": {
+          "package_name": "com.example.firebase_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3r9opO4sv11ENl64NrWA5TdZ7vZZzYEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
