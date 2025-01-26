@@ -1,3 +1,5 @@
+import 'package:firebase_connect/SME_Manager/LoginPage.dart';
+import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
@@ -7,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'new_implementation/addProduct.dart';
 import 'extras/addSalesOwner.dart';
 import 'new_implementation/dashboard.dart';
-import 'new_implementation/login.dart';
 import 'new_implementation/reports.dart';
 import 'new_implementation/sales.dart';
 
@@ -17,7 +18,7 @@ void main() async {
   await Firebase.initializeApp();
   runApp(
     MaterialApp(
-      initialRoute: '/home',
+      initialRoute: '/login',
       // initialRoute: '/profileUpdate',
       routes: {
         '/login': (context) => LoginScreen(),

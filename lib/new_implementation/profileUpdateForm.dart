@@ -204,7 +204,9 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         });
                       },
                     ),
-  const SizedBox(height: 10,),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     // District Dropdown
                     DropdownButtonFormField<String>(
                       value: selectedDistrict.isEmpty ? null : selectedDistrict,
@@ -238,7 +240,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple,
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 30),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -290,7 +292,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   InputDecoration _dropdownStyle(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(fontSize: 16, color: Colors.deepPurple),
+      labelStyle: const TextStyle(fontSize: 16, color: Colors.deepPurple),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
@@ -299,7 +301,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+        borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
       ),
     );
   }
@@ -310,7 +312,8 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
       appBar: AppBar(
         title: const Text(
           'Update Profile',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         // flexibleSpace: Container(
@@ -359,8 +362,8 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    const BoxShadow(
+                  boxShadow: const [
+                    BoxShadow(
                       color: Colors.black12,
                       blurRadius: 10,
                       spreadRadius: 2,
@@ -434,7 +437,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: const TextStyle(
             color: Colors.deepPurple,
             fontWeight: FontWeight.bold,
           ),
@@ -442,7 +445,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           filled: true,
           fillColor:
               Colors.white, // Lightened background color for better contrast
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
               vertical: 14, horizontal: 12), // Improved padding
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -452,7 +455,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
                 color: Colors.deepPurple,
                 width: 2), // Highlight border on focus
           ),
