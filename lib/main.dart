@@ -20,7 +20,7 @@ void main() async {
       // initialRoute: '/profileUpdate',
       routes: {
         '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => const HomeScreen(),
         '/sales': (context) => SalesScreen(),
         '/purchase': (context) => SalesScreen(), // Similar logic for purchase
         '/reports': (context) => ReportsScreen(),

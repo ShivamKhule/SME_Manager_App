@@ -124,7 +124,7 @@ class _SignUpPageState extends State<SignUpScreen> {
                                   .format(DateTime.now());
                               try {
                                 await _firestore
-                                    .collection('userProfiles')
+                                    .collection('users')
                                     .doc(emailController.text.trim())
                                     .set({
                                   'email': emailController.text.trim(),

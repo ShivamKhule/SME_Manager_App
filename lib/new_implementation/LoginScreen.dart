@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_connect/new_implementation/SignUpScreen.dart';
 import 'package:firebase_connect/new_implementation/dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +27,22 @@ class _LoginPageState extends State<LoginScreen> {
   }
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  // Function to save user data
+  Future<void> saveUserCredentials(String userId, String email) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+    await prefs.setString('email', email);
+    // log(userId);
+    // log(email);
+  }
+
+  Future<Map<String, String?>> getUserCredentials() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    String? email = prefs.getString('email');
+    return {'userId': userId, 'email': email};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +73,7 @@ class _LoginPageState extends State<LoginScreen> {
                     color: Colors.black87,
                   ),
                 ),
-                
+
                 const SizedBox(height: 10),
                 // Login Card
                 Container(
@@ -101,12 +118,16 @@ class _LoginPageState extends State<LoginScreen> {
                           if (emailController.text.trim().isNotEmpty &&
                               passwordController.text.trim().isNotEmpty) {
                             try {
-                              UserCredential userCredential =
+                              UserCredential userCredential =     
                                   await _firebaseAuth
                                       .signInWithEmailAndPassword(
                                           email: emailController.text.trim(),
-                                          password:
-                                              passwordController.text.trim());
+                                          password: passwordController.text.trim());
+                              // Save user credentials
+                              await saveUserCredentials(
+                                  userCredential.user!.uid,
+                                  userCredential.user!.email!);
+
                               ToastService.showSuccessToast(
                                 context,
                                 length: ToastLength.medium,
