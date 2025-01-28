@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:toasty_box/toasty_box.dart';
 import 'package:toasty_box/toast_enums.dart';
@@ -16,7 +13,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpScreen> {
-  bool isAdmin = false; // Toggle between Admin and User SignUp
   bool isPasswordVisible = false; // Toggle password visibility
   bool isConfirmPasswordVisible = false; // Toggle confirm password visibility
 
@@ -46,13 +42,13 @@ class _SignUpPageState extends State<SignUpScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
+                const SizedBox(height: 80),
                 Image.asset(
-                  "assets/images/list.png",
-                  width: 90,
-                  height: 90,
+                  "assets/images/logo1.jpg",
+                  width: 120,
+                  height: 120,
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 25),
                 // Logo or Welcome Text
                 Text(
                   "Create Account",
@@ -62,38 +58,7 @@ class _SignUpPageState extends State<SignUpScreen> {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 10),
-                // Sign Up Type Toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "User SignUp",
-                      style: GoogleFonts.quicksand(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: !isAdmin ? Colors.blue : Colors.black54,
-                      ),
-                    ),
-                    Switch(
-                      value: isAdmin,
-                      onChanged: (value) {
-                        setState(() {
-                          isAdmin = value;
-                        });
-                      },
-                    ),
-                    Text(
-                      "Admin SignUp",
-                      style: GoogleFonts.quicksand(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isAdmin ? Colors.blue : Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 // Sign Up Card
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -122,7 +87,7 @@ class _SignUpPageState extends State<SignUpScreen> {
                       // Email Field
                       _buildTextField(
                         controller: emailController,
-                        label: isAdmin ? "Admin Email" : "User Email",
+                        label: "User Email",
                         icon: Icons.email,
                         obscureText: false,
                       ),
@@ -134,7 +99,7 @@ class _SignUpPageState extends State<SignUpScreen> {
                       // Confirm Password Field with visibility toggle
                       _buildPasswordField("Confirm Password",
                           isConfirmPasswordVisible, confirmPasswordController),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 40),
                       // Sign Up Button
                       ElevatedButton(
                         onPressed: () async {
@@ -166,8 +131,7 @@ class _SignUpPageState extends State<SignUpScreen> {
                                   'password':
                                       confirmPasswordController.text.trim(),
                                   'loginTime': currentTime,
-                                  'loginDate': currentDate,
-                                  'isAdmin': isAdmin,                               
+                                  'loginDate': currentDate,                              
                                 });
                               } on FirebaseException catch (error) {
                                 ToastService.showWarningToast(
@@ -227,74 +191,11 @@ class _SignUpPageState extends State<SignUpScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      // Divider
-                      Row(
-                        children: [
-                          Expanded(child: Divider(color: Colors.grey[300])),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              "OR",
-                              style: GoogleFonts.quicksand(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ),
-                          Expanded(child: Divider(color: Colors.grey[300])),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Google Sign-In Button
-                      GestureDetector(
-                        onTap: () {
-                          // Handle Google Sign-In logic
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Colors.white, Color(0xFFEEEEEE)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(4, 4),
-                              ),
-                              const BoxShadow(
-                                color: Colors.white,
-                                blurRadius: 8,
-                                offset: Offset(-4, -4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset("assets/svgs/google.svg"),
-                              const SizedBox(width: 10),
-                              Text(
-                                "Sign up with Google",
-                                style: GoogleFonts.quicksand(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 20),
                 RichText(
                   text: TextSpan(
                     style: GoogleFonts.quicksand(
@@ -374,7 +275,7 @@ class _SignUpPageState extends State<SignUpScreen> {
           prefixIcon: Icon(icon, color: Colors.black54),
           hintText: label,
           hintStyle: GoogleFonts.quicksand(
-            fontSize: 14,
+            fontSize: 16,
             color: Colors.black38,
           ),
         ),
@@ -414,7 +315,7 @@ class _SignUpPageState extends State<SignUpScreen> {
           prefixIcon: const Icon(Icons.lock, color: Colors.black54),
           hintText: label,
           hintStyle: GoogleFonts.quicksand(
-            fontSize: 14,
+            fontSize: 16,
             color: Colors.black38,
           ),
           suffixIcon: IconButton(

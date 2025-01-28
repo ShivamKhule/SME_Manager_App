@@ -1,5 +1,4 @@
-import 'package:firebase_connect/SME_Manager/LoginPage.dart';
-import 'package:firebase_connect/new_implementation/LoginScreen.dart';
+  import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
@@ -11,7 +10,6 @@ import 'extras/addSalesOwner.dart';
 import 'new_implementation/dashboard.dart';
 import 'new_implementation/reports.dart';
 import 'new_implementation/sales.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
