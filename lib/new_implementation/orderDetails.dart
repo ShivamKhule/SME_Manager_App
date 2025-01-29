@@ -29,7 +29,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   Widget build(BuildContext context) {
     final productsRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(Provider.of<Logindetails>(context).userEmail)
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
         .collection('sales')
         .doc(widget.ownerId)
         .collection('orders')
@@ -143,7 +143,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         final productsSnapshot = await FirebaseFirestore
                             .instance
                             .collection('users')
-                            .doc(Provider.of<Logindetails>(context).userEmail)
+                            .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
                             .collection('sales')
                             .doc(widget.ownerId)
                             .collection('orders')

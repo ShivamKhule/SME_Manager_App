@@ -39,7 +39,7 @@ class _AddOrderWithProductsScreenState
     if (orderId.isNotEmpty && orderDate.isNotEmpty && products.isNotEmpty) {
       final orderRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(Provider.of<Logindetails>(context).userEmail)
+          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
           .collection('sales')
           .doc(widget.ownerId)
           .collection('orders')

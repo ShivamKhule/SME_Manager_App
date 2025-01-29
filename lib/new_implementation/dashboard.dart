@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(
                             // "R. K. Enterprises",
-                            Provider.of<Logindetails>(context).userEmail,
+                            Provider.of<Logindetails>(context, listen: false).userEmail,
                             style: TextStyle(
                               fontSize: screenWidth * 0.05,
                               fontWeight: FontWeight.bold,

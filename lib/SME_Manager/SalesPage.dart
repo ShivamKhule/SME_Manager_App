@@ -131,7 +131,7 @@ class _SalesPageState extends State<SalesPage> {
     // Adding sales -> owners -> orders -> products
     await firestore
         .collection('users') // Top-level collection
-        .doc(Provider.of<Logindetails>(context).userEmail) // Document for the user
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail) // Document for the user
         .collection('sales') // Sales subcollection
         .doc('owners') // Owners document
         .collection('orders') // Orders subcollection
@@ -144,7 +144,7 @@ class _SalesPageState extends State<SalesPage> {
     // Adding purchase -> company -> orders -> products
     await firestore
         .collection('users')
-        .doc(Provider.of<Logindetails>(context).userEmail)
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
         .collection('purchase')
         .doc('company')
         .collection('orders')
@@ -157,7 +157,7 @@ class _SalesPageState extends State<SalesPage> {
     // Adding reports (if needed)
     await firestore
         .collection('users')
-        .doc(Provider.of<Logindetails>(context).userEmail)
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
         .collection('reports')
         .doc('report2')
         .set({
