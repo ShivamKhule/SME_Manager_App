@@ -1,5 +1,4 @@
 import 'package:firebase_connect/controller/LoginDetails.dart';
-import 'package:firebase_connect/extras/shareModule.dart';
 import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
