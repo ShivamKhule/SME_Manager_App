@@ -1,5 +1,7 @@
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class AddSalesOwnerScreen extends StatelessWidget {
   @override
@@ -62,7 +64,7 @@ class AddSalesOwnerScreen extends StatelessWidget {
                   if (ownerName.isNotEmpty) {
                     FirebaseFirestore.instance
                         .collection('users')
-                        .doc('username1')
+                        .doc(Provider.of<Logindetails>(context).userEmail)
                         .collection('sales')
                         .doc(ownerName)
                         .set({});

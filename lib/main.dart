@@ -1,7 +1,10 @@
-  import 'package:firebase_connect/new_implementation/LoginScreen.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_connect/extras/shareModule.dart';
+import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -14,28 +17,37 @@ import 'new_implementation/sales.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(
-    MaterialApp(
-      initialRoute: '/login',
-      // initialRoute: '/profileUpdate',
-      routes: {
-        '/login': (context) => LoginScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/sales': (context) => SalesScreen(),
-        '/purchase': (context) => SalesScreen(), // Similar logic for purchase
-        '/reports': (context) => ReportsScreen(),
-
-        '/addSalesOwner': (context) => AddSalesOwnerScreen(),
-        // '/addOrder': (context) => AddOrderScreen(ownerId: ''),
-        '/addProduct': (context) => AddProductScreen(orderPath: ''),
-        '/categories': (context) => Categories(),
-        '/managestaff': (context) => const ManageStaffScreen(),
-        '/profileUpdate': (context) => ProfileUpdatePage(),
-      },
-    ),
-  );
+  runApp(MyApp());
 }
 
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) {
+        return Logindetails(userEmail: '');
+      },
+      child: MaterialApp(
+        initialRoute: '/login',
+        // initialRoute: '/profileUpdate',
+        routes: {
+          '/login': (context) => LoginScreen(),
+          '/home': (context) => const HomeScreen(),
+          '/sales': (context) => SalesScreen(),
+          '/purchase': (context) => SalesScreen(), // Similar logic for purchase
+          '/reports': (context) => ReportsScreen(),
+
+          '/addSalesOwner': (context) => AddSalesOwnerScreen(),
+          // '/addOrder': (context) => AddOrderScreen(ownerId: ''),
+          '/addProduct': (context) => AddProductScreen(orderPath: ''),
+          '/categories': (context) => Categories(),
+          '/managestaff': (context) => const ManageStaffScreen(),
+          '/profileUpdate': (context) => ProfileUpdatePage(),
+        },
+      ),
+    );
+  }
+}
 
 // import 'package:firebase_connect/SME_Manager/HomePage.dart';
 // import 'package:firebase_connect/SME_Manager/LoginPage.dart';
@@ -45,7 +57,7 @@ void main() async {
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   await Firebase.initializeApp();
-  
+
 //   runApp(const MyApp());
 // }
 

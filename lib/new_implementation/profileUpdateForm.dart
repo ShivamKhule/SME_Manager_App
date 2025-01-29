@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:provider/provider.dart';
 
 class ProfileUpdatePage extends StatefulWidget {
   @override
@@ -13,7 +18,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController ownerNameController = TextEditingController();
   final TextEditingController gstinController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
+  // final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController businessDomainController =
       TextEditingController();
@@ -43,107 +48,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     }
   }
 
-  /*void _openAddressDialog() {
-    TextEditingController address1Controller =
-        TextEditingController(text: addressLine1);
-    TextEditingController address2Controller =
-        TextEditingController(text: addressLine2);
-    TextEditingController landmarkController =
-        TextEditingController(text: landmark);
-    TextEditingController cityController = TextEditingController(text: city);
-    TextEditingController pincodeController =
-        TextEditingController(text: pincode);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text("Enter Address",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 12),
-                    _buildPopupTextField("Address Line 1", address1Controller),
-                    _buildPopupTextField("Address Line 2", address2Controller),
-                    _buildPopupTextField("Landmark", landmarkController),
-                    _buildPopupTextField("City", cityController),
-                    _buildPopupTextField("Pincode", pincodeController),
-                    DropdownButtonFormField<String>(
-                      value: selectedState.isEmpty ? null : selectedState,
-                      decoration: _dropdownStyle("Select State"),
-                      items: stateDistricts.keys.map((state) {
-                        return DropdownMenuItem(
-                            value: state, child: Text(state));
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedState = value!;
-                          selectedDistrict = "";
-                        });
-                      },
-                    ),
-                    DropdownButtonFormField<String>(
-                      value: selectedDistrict.isEmpty ? null : selectedDistrict,
-                      decoration: _dropdownStyle("Select District"),
-                      items: selectedState.isNotEmpty
-                          ? stateDistricts[selectedState]!.map((district) {
-                              return DropdownMenuItem(
-                                  value: district, child: Text(district));
-                            }).toList()
-                          : [],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedDistrict = value!;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          child: const Text("Cancel",
-                              style: TextStyle(color: Colors.red)),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.indigo),
-                          child: const Text("Save",
-                              style: TextStyle(color: Colors.white)),
-                          onPressed: () {
-                            setState(() {
-                              addressLine1 = address1Controller.text;
-                              addressLine2 = address2Controller.text;
-                              landmark = landmarkController.text;
-                              city = cityController.text;
-                              pincode = pincodeController.text;
-                              addressController.text =
-                                  "$addressLine1, $addressLine2, $landmark, $city, $selectedDistrict, $selectedState - $pincode";
-                            });
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-      },
-    );
-  }
-*/
   void _openAddressDialog() {
     TextEditingController address1Controller =
         TextEditingController(text: addressLine1);
@@ -306,6 +210,81 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
+  // code to Store the image at Firebase Storage
+  Future<String?> _uploadImageToFirebase(File imageFile) async {
+    try {
+      String fileName =
+          "profile_images/${Provider.of<Logindetails>(context, listen: false).userEmail}.jpg";
+      Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = storageRef.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Function to send data at Firebase Firestore
+  Future<void> _saveDataToFirestore() async {
+    try {
+      String? imageUrl;
+      if (_image != null) {
+        imageUrl = await _uploadImageToFirebase(_image!);
+      }
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+          .set({
+        'company_name': companyNameController.text,
+        'owner_name': ownerNameController.text,
+        'gstin': gstinController.text,
+        // 'email': emailController.text,
+        'mobile': mobileController.text,
+        'business_domain': businessDomainController.text,
+        'address': {
+          'line1': addressLine1,
+          'line2': addressLine2,
+          'landmark': landmark,
+          'city': city,
+          'district': selectedDistrict,
+          'state': selectedState,
+          'pincode': pincode,
+        },
+        'profile_image': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      companyNameController.clear();
+      ownerNameController.clear();
+      gstinController.clear();
+      mobileController.clear();
+      businessDomainController.clear();
+      addressController.clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+      Navigator.of(context).pushReplacementNamed("/home");
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    companyNameController.clear();
+    ownerNameController.clear();
+    gstinController.clear();
+    mobileController.clear();
+    businessDomainController.clear();
+    addressController.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -379,7 +358,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         "Owner Name", ownerNameController, Icons.person),
                     _buildTextField(
                         "GSTIN", gstinController, Icons.confirmation_number),
-                    _buildTextField("Email ID", emailController, Icons.email),
                     _buildTextField("Mobile", mobileController, Icons.phone),
                     _buildTextField("Business Domain", businessDomainController,
                         Icons.domain),
@@ -407,7 +385,10 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _saveDataToFirestore();
+                  setState(() {});
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   padding:

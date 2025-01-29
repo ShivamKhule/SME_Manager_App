@@ -1,5 +1,7 @@
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 import 'orders.dart';
 
@@ -65,7 +67,7 @@ class _SalesScreenState extends State<SalesScreen> {
                   if (ownerName.isNotEmpty) {
                     FirebaseFirestore.instance
                         .collection('users')
-                        .doc('username1')
+                        .doc(Provider.of<Logindetails>(context).userEmail)
                         .collection('sales')
                         .doc(ownerName)
                         .set({});
@@ -131,7 +133,7 @@ class _SalesScreenState extends State<SalesScreen> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('users/username1/sales')
+                  .collection('users/${Provider.of<Logindetails>(context).userEmail}/sales')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -174,7 +176,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             MaterialPageRoute(
                               builder: (context) => OrdersScreen(
                                 collectionPath:
-                                    'users/username1/sales/${data[index].id}/orders',
+                                    'users/${Provider.of<Logindetails>(context).userEmail}/sales/${data[index].id}/orders',
                                 ownerId: data[index].id,
                               ),
                             ),

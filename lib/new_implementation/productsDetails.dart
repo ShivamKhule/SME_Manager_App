@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final String ownerId;
@@ -11,7 +13,7 @@ class ProductDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productsRef = FirebaseFirestore.instance
         .collection('users')
-        .doc('username1')
+        .doc(Provider.of<Logindetails>(context).userEmail)
         .collection('sales')
         .doc(ownerId)
         .collection('orders')

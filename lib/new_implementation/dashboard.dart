@@ -1,5 +1,9 @@
+import 'dart:developer';
+
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:firebase_connect/new_implementation/DrawerPage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'productsListings.dart';
@@ -115,6 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<String> userEmail() async{
+    String userEmail = Provider.of<Logindetails>(context).userEmail;
+    log("email : $userEmail");
+    return userEmail;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
@@ -196,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "R. K. Enterprises",
+                            // "R. K. Enterprises",
+                            Provider.of<Logindetails>(context).userEmail,
                             style: TextStyle(
                               fontSize: screenWidth * 0.05,
                               fontWeight: FontWeight.bold,

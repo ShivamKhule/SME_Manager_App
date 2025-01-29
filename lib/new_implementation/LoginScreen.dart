@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:firebase_connect/new_implementation/SignUpScreen.dart';
 import 'package:firebase_connect/new_implementation/dashboard.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -123,6 +125,8 @@ class _LoginPageState extends State<LoginScreen> {
                                       .signInWithEmailAndPassword(
                                           email: emailController.text.trim(),
                                           password: passwordController.text.trim());
+
+                                          Provider.of<Logindetails>(context, listen: false).setUserEmail(emailController.text.trim());
                               // Save user credentials
                               await saveUserCredentials(
                                   userCredential.user!.uid,

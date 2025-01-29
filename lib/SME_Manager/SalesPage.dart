@@ -1,10 +1,12 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../Generate_PDF/page/pdf_page.dart';
 import '../model/Item_Model.dart';
 import 'HomePage.dart';
@@ -124,12 +126,12 @@ class _SalesPageState extends State<SalesPage> {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     // Define username document
-    String username = "username1";
+    // String username = "username1";
 
     // Adding sales -> owners -> orders -> products
     await firestore
         .collection('users') // Top-level collection
-        .doc(username) // Document for the user
+        .doc(Provider.of<Logindetails>(context).userEmail) // Document for the user
         .collection('sales') // Sales subcollection
         .doc('owners') // Owners document
         .collection('orders') // Orders subcollection
@@ -142,7 +144,7 @@ class _SalesPageState extends State<SalesPage> {
     // Adding purchase -> company -> orders -> products
     await firestore
         .collection('users')
-        .doc(username)
+        .doc(Provider.of<Logindetails>(context).userEmail)
         .collection('purchase')
         .doc('company')
         .collection('orders')
@@ -155,7 +157,7 @@ class _SalesPageState extends State<SalesPage> {
     // Adding reports (if needed)
     await firestore
         .collection('users')
-        .doc(username)
+        .doc(Provider.of<Logindetails>(context).userEmail)
         .collection('reports')
         .doc('report2')
         .set({

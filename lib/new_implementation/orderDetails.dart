@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_connect/Generate_PDF/page/pdf_page.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../Generate_PDF/model/invoice.dart';
 
@@ -27,7 +29,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   Widget build(BuildContext context) {
     final productsRef = FirebaseFirestore.instance
         .collection('users')
-        .doc('username1')
+        .doc(Provider.of<Logindetails>(context).userEmail)
         .collection('sales')
         .doc(widget.ownerId)
         .collection('orders')
@@ -141,7 +143,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         final productsSnapshot = await FirebaseFirestore
                             .instance
                             .collection('users')
-                            .doc('username1')
+                            .doc(Provider.of<Logindetails>(context).userEmail)
                             .collection('sales')
                             .doc(widget.ownerId)
                             .collection('orders')

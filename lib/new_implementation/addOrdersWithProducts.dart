@@ -1,6 +1,8 @@
+import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AddOrderWithProductsScreen extends StatefulWidget {
   final String ownerId;
@@ -37,7 +39,7 @@ class _AddOrderWithProductsScreenState
     if (orderId.isNotEmpty && orderDate.isNotEmpty && products.isNotEmpty) {
       final orderRef = FirebaseFirestore.instance
           .collection('users')
-          .doc('username1')
+          .doc(Provider.of<Logindetails>(context).userEmail)
           .collection('sales')
           .doc(widget.ownerId)
           .collection('orders')
