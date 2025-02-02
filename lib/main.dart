@@ -1,10 +1,10 @@
 import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/ProfileScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +18,14 @@ import 'new_implementation/sales.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  DatabaseHelper dbHelper = DatabaseHelper();
+  await dbHelper.initDatabase();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -30,21 +34,21 @@ class MyApp extends StatelessWidget {
       },
       child: MaterialApp(
         initialRoute: '/login',
-        // initialRoute: '/profileUpdate',
+        // initialRoute: '/home',
         routes: {
           '/login': (context) => LoginScreen(),
           '/home': (context) => const HomeScreen(),
           '/sales': (context) => SalesScreen(),
-          '/purchase': (context) => SalesScreen(), // Similar logic for purchase
+          '/purchase': (context) => SalesScreen(),
           '/reports': (context) => ReportsScreen(),
 
           '/addSalesOwner': (context) => AddSalesOwnerScreen(),
-          // '/addOrder': (context) => AddOrderScreen(ownerId: ''),
           '/addProduct': (context) => AddProductScreen(orderPath: ''),
           '/categories': (context) => Categories(),
           '/managestaff': (context) => const ManageStaffScreen(),
           '/profileUpdate': (context) => ProfileUpdatePage(),
-          '/profileScreen': (context) => ProfileScreenNew()
+          '/profileScreen': (context) => const ProfileScreenNew(),
+
         },
       ),
     );

@@ -13,8 +13,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpScreen> {
-  bool isPasswordVisible = false; // Toggle password visibility
-  bool isConfirmPasswordVisible = false; // Toggle confirm password visibility
+  bool isPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -49,7 +49,6 @@ class _SignUpPageState extends State<SignUpScreen> {
                   height: 120,
                 ),
                 const SizedBox(height: 25),
-                // Logo or Welcome Text
                 Text(
                   "Create Account",
                   style: GoogleFonts.quicksand(
@@ -59,7 +58,6 @@ class _SignUpPageState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Sign Up Card
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -92,18 +90,15 @@ class _SignUpPageState extends State<SignUpScreen> {
                         obscureText: false,
                       ),
                       const SizedBox(height: 16),
-                      // Password Field with visibility toggle
                       _buildPasswordField(
                           "Password", isPasswordVisible, passwordController),
                       const SizedBox(height: 16),
-                      // Confirm Password Field with visibility toggle
                       _buildPasswordField("Confirm Password",
                           isConfirmPasswordVisible, confirmPasswordController),
                       const SizedBox(height: 40),
                       // Sign Up Button
                       ElevatedButton(
                         onPressed: () async {
-                          // Handle sign-up logic
                           if (emailController.text.trim().isNotEmpty &&
                               passwordController.text.trim().isNotEmpty &&
                               confirmPasswordController.text
@@ -208,26 +203,16 @@ class _SignUpPageState extends State<SignUpScreen> {
                         text: "Login",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.green, // You can customize the color
+                          color: Colors.green,
                           decoration:
-                              TextDecoration.underline, // Optional underline
+                              TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            // Add your SignUp tap action here
                             Navigator.pop(context);
                           },
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Footer
-                Text(
-                  "Powered by Shivam Khule",
-                  style: GoogleFonts.quicksand(
-                    fontSize: 12,
-                    color: Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 20),

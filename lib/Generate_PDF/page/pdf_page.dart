@@ -7,17 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class PdfPage extends StatefulWidget {
-  final List<InvoiceItem> items; // Declare items property
+  final List<InvoiceItem> items;
 
   const PdfPage(
-      {super.key, required this.items}); // Assign items in constructor
+      {super.key, required this.items});
 
   @override
   State<PdfPage> createState() => _PdfPageState();
 }
 
 class _PdfPageState extends State<PdfPage> {
-  String amountStatus = "Paid"; // You can toggle between "Paid" or "Remain"
+  String amountStatus = "Paid";
 
   List<int>? pdfFile;
 
@@ -345,7 +345,7 @@ class _PdfPageState extends State<PdfPage> {
 //           children: [
 //             const TitleWidget(
 //               icon: Icons.picture_as_pdf,
-//               text: 'Generate Invoice',
+//               text: ' Invoice',
 //             ),
 //             const Icon(
 //               Icons.picture_as_pdf,

@@ -14,14 +14,191 @@ class _SalesScreenState extends State<SalesScreen> {
   String searchQuery = "";
   final FocusNode _searchFocusNode = FocusNode();
 
+  final TextEditingController addressController = TextEditingController();
+
   @override
   void dispose() {
     _searchFocusNode.dispose();
     super.dispose();
   }
 
+  // Address Fields
+  String addressLine1 = "",
+      addressLine2 = "",
+      landmark = "",
+      city = "",
+      pincode = "",
+      selectedState = "",
+      selectedDistrict = "";
+
+  Map<String, List<String>> stateDistricts = {
+    "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+    "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+    "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
+  };
+
+  Widget _buildPopupTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+    );
+  }
+
+  // _dropdownStyle enhancement for uniformity
+  InputDecoration _dropdownStyle(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(fontSize: 16, color: Colors.deepPurple),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.deepPurple.shade100, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+      ),
+    );
+  }
+
+  void openAddressDialog() {
+    TextEditingController address1Controller =
+        TextEditingController(text: addressLine1);
+    TextEditingController address2Controller =
+        TextEditingController(text: addressLine2);
+    TextEditingController landmarkController =
+        TextEditingController(text: landmark);
+    TextEditingController cityController = TextEditingController(text: city);
+    TextEditingController pincodeController =
+        TextEditingController(text: pincode);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 12,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Enter Address",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildPopupTextField("Address Line 1", address1Controller),
+                    _buildPopupTextField("Address Line 2", address2Controller),
+                    _buildPopupTextField("Landmark", landmarkController),
+                    _buildPopupTextField("City", cityController),
+                    _buildPopupTextField("Pincode", pincodeController),
+                    DropdownButtonFormField<String>(
+                      value: selectedState.isEmpty ? null : selectedState,
+                      decoration: _dropdownStyle("Select State"),
+                      items: stateDistricts.keys.map((state) {
+                        return DropdownMenuItem(
+                          value: state,
+                          child: Text(state),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedState = value!;
+                          selectedDistrict = "";
+                        });
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: selectedDistrict.isEmpty ? null : selectedDistrict,
+                      decoration: _dropdownStyle("Select District"),
+                      items: selectedState.isNotEmpty
+                          ? stateDistricts[selectedState]!.map((district) {
+                              return DropdownMenuItem(
+                                value: district,
+                                child: Text(district),
+                              );
+                            }).toList()
+                          : [],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedDistrict = value!;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.red, fontSize: 16),
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 30),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              addressLine1 = address1Controller.text;
+                              addressLine2 = address2Controller.text;
+                              landmark = landmarkController.text;
+                              city = cityController.text;
+                              pincode = pincodeController.text;
+                              addressController.text =
+                                  "$addressLine1, $addressLine2, $landmark, $city, $selectedDistrict, $selectedState - $pincode";
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "Save",
+                            style: TextStyle(fontSize: 21, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
   void showAddSalesOwnerDialog(BuildContext context) {
-    final TextEditingController _ownerNameController = TextEditingController();
+    final TextEditingController ownerNameController = TextEditingController();
+    final TextEditingController gstinController = TextEditingController();
+    final TextEditingController mobileController = TextEditingController();
+    final TextEditingController businessDomainController =
+        TextEditingController();
 
     showDialog(
       context: context,
@@ -42,7 +219,7 @@ class _SalesScreenState extends State<SalesScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _ownerNameController,
+                controller: ownerNameController,
                 decoration: InputDecoration(
                   labelText: 'Party Name',
                   labelStyle: const TextStyle(
@@ -51,6 +228,30 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              _buildTextField(
+                  "GSTIN", gstinController, Icons.confirmation_number),
+              _buildTextField("Mobile", mobileController, Icons.phone),
+              _buildTextField(
+                  "Business Domain", businessDomainController, Icons.domain),
+              GestureDetector(
+                onTap: openAddressDialog,
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: addressController,
+                    decoration: InputDecoration(
+                      labelText: "Address",
+                      hintText: "Click to enter address",
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      suffixIcon: const Icon(Icons.location_on,
+                          color: Colors.deepPurple),
+                    ),
                   ),
                 ),
               ),
@@ -63,14 +264,27 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                 ),
                 onPressed: () {
-                  final ownerName = _ownerNameController.text.trim();
+                  final ownerName = ownerNameController.text.trim();
                   if (ownerName.isNotEmpty) {
                     FirebaseFirestore.instance
                         .collection('users')
-                        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+                        .doc(Provider.of<Logindetails>(context, listen: false)
+                            .userEmail)
                         .collection('sales')
                         .doc(ownerName)
-                        .set({});
+                        .set(
+                      {
+                        'address': {
+                          'line1': addressLine1,
+                          'line2': addressLine2,
+                          'landmark': landmark,
+                          'city': city,
+                          'district': selectedDistrict,
+                          'state': selectedState,
+                          'pincode': pincode,
+                        },
+                      },
+                    );
 
                     Navigator.pop(context);
                   }
@@ -78,11 +292,10 @@ class _SalesScreenState extends State<SalesScreen> {
                 child: const Text(
                   'Add Party',
                   style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white
-                  ),
+                      fontFamily: 'Quicksand',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
                 ),
               ),
             ],
@@ -133,7 +346,8 @@ class _SalesScreenState extends State<SalesScreen> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('users/${Provider.of<Logindetails>(context).userEmail}/sales')
+                  .collection(
+                      'users/${Provider.of<Logindetails>(context).userEmail}/sales')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -206,65 +420,45 @@ class _SalesScreenState extends State<SalesScreen> {
       ),
     );
   }
-}
 
-
-
-
-
-/*import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'addSalesOwner.dart';
-import 'orders.dart';
-
-class SalesScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sales')),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users/username1/sales')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData)
-            return const Center(child: CircularProgressIndicator());
-          final data = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(data[index].id), // Document ID (e.g., "owners")
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OrdersScreen(
-                        collectionPath:
-                            'users/username1/sales/${data[index].id}/orders', ownerId: data[index].id
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddSalesOwnerScreen(),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
+  Widget _buildTextField(
+      String label, TextEditingController controller, IconData icon) {
+    return Padding(
+      padding:
+          const EdgeInsets.only(bottom: 16.0), // Increased space for clarity
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(
+            color: Colors.deepPurple,
+            fontWeight: FontWeight.bold,
+          ),
+          prefixIcon: Icon(icon, color: Colors.deepPurple),
+          filled: true,
+          fillColor:
+              Colors.white, // Lightened background color for better contrast
+          contentPadding: const EdgeInsets.symmetric(
+              vertical: 14, horizontal: 12), // Improved padding
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+                color: Colors.deepPurple.shade200,
+                width: 1), // Lighter border color
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+                color: Colors.deepPurple,
+                width: 2), // Highlight border on focus
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+                color: Colors.deepPurple.shade100, width: 1), // Default border
+          ),
+        ),
       ),
     );
   }
 }
-*/

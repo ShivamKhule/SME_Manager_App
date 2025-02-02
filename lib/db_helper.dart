@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import 'model/ProfileModel.dart';
+
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
@@ -10,40 +12,63 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _database = await initDatabase();
     return _database!;
-  } 
+  }
 
-  Future<Database> _initDatabase() async {
-
+  Future<Database> initDatabase() async {
     return await openDatabase(
-      join(await getDatabasesPath(), 'SME_Manager.db'),
+      join(await getDatabasesPath(), 'SMEManager.db'),
       onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE sales(srno INTEGER, name TEXT PRIMARY KEY, amount INTEGER, paid INTEGER, totalAmount INTEGER, date TEXT)',
-        );
+        return db.execute('''CREATE TABLE profile(
+          company_name TEXT,
+          owner_name TEXT,
+          gstin TEXT,
+          mobile TEXT,
+          business_domain TEXT,
+          address_line1 TEXT,
+          address_line2 TEXT,
+          landmark TEXT,
+          city TEXT,
+          district TEXT,
+          state TEXT,
+          pincode TEXT,
+          profile_image TEXT,
+        )''');
       },
       version: 1,
     );
   }
 
-  Future<void> insertItem({int? srno, String? name, int? amount, int? paid, int? totalAmount, String? date}) async {
-    final db = await database;
-    await db.insert(
-      'sales',
-      {'srno': srno, 'name': name, 'amount' : amount, 'paid' : paid, 'totalAmount' : totalAmount, 'date' : date},
+  Future<void> insertData(ProfileModel obj) async {
+    Database localDB = await initDatabase();
+
+    await localDB.insert(
+      'profile',
+      obj.profileModelMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<List<Map<String, dynamic>>> fetchItems() async {
-    final db = await database;
-    return await db.query('sales');
+  Future<List<Map<String, dynamic>>> getData() async {
+    Database localDB = await initDatabase();
+
+    List<Map<String, dynamic>> dataList = await localDB.query('profile');
+    return dataList;
   }
 
-  Future<void> deleteItem(String name) async {
-    final db = await database;
-    await db.delete('sales', where: 'name = ?', whereArgs: [name]);
+  Future<List<Map<String, dynamic>>> fetchAndStoreData() async {
+    List<Map<String, dynamic>> data = await getData();
+    return data;
   }
 
+  Future<void> updateData(ProfileModel obj) async {
+    Database localDB = await initDatabase();
+    await localDB.update(
+      'profile',
+      obj.profileModelMap(),
+      where: 'company_name = ?',
+      whereArgs: [obj.companyName],
+    );
+  }
 }

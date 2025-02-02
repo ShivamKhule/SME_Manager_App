@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../db_helper.dart';
 
 class ProfileScreenNew extends StatefulWidget {
   const ProfileScreenNew({Key? key}) : super(key: key);
@@ -14,6 +18,8 @@ class ProfileScreenNew extends StatefulWidget {
 class _ProfileScreenNewState extends State<ProfileScreenNew> {
   Map<String, dynamic>? userData;
 
+  DatabaseHelper dbHelper = DatabaseHelper();
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +28,9 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
 
   Future<void> fetchProfileData() async {
     try {
+      List<Map<String, dynamic>> data = await dbHelper.fetchAndStoreData();
+      log("$data");
+
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
@@ -52,9 +61,11 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(onPressed: (){
-          Navigator.of(context).pushReplacementNamed('/home');
-        }, icon: const Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed('/home');
+            },
+            icon: const Icon(Icons.arrow_back)),
       ),
       body: Stack(
         children: [
@@ -74,10 +85,10 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
               ? const Center(
                   child: CircularProgressIndicator(color: Colors.white))
               : Container(
-                margin: EdgeInsets.only(top: 105),
-                child: SingleChildScrollView(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+                  margin: EdgeInsets.only(top: 105),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -110,7 +121,7 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                
+
                         // Profile Info Card with Glassmorphism
                         _glassmorphicCard(
                           child: Column(
@@ -134,9 +145,9 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
                             ],
                           ),
                         ),
-                
+
                         const SizedBox(height: 20),
-                
+
                         // Address Card
                         if (userData!['address'] != null)
                           _glassmorphicCard(
@@ -174,7 +185,7 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
                       ],
                     ),
                   ),
-              ),
+                ),
         ],
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:firebase_connect/new_implementation/SignUpScreen.dart';
-import 'package:firebase_connect/new_implementation/dashboard.dart';
+import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/gestures.dart';
@@ -16,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginScreen> {
-  bool isPasswordVisible = false; // Toggle password visibility
+  bool isPasswordVisible = false;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -53,7 +53,6 @@ class _LoginPageState extends State<LoginScreen> {
       // backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: SingleChildScrollView(
-          // Prevent overflow when keyboard appears
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
@@ -66,7 +65,6 @@ class _LoginPageState extends State<LoginScreen> {
                   height: 120,
                 ),
                 const SizedBox(height: 25),
-                // Logo or Welcome Text
                 Text(
                   "Welcome Back!",
                   style: GoogleFonts.quicksand(
@@ -77,7 +75,6 @@ class _LoginPageState extends State<LoginScreen> {
                 ),
 
                 const SizedBox(height: 10),
-                // Login Card
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -102,7 +99,6 @@ class _LoginPageState extends State<LoginScreen> {
                   ),
                   child: Column(
                     children: [
-                      // Email Field
                       _buildTextField(
                         controller: emailController,
                         label: "User Email",
@@ -110,13 +106,10 @@ class _LoginPageState extends State<LoginScreen> {
                         obscureText: false,
                       ),
                       const SizedBox(height: 16),
-                      // Password Field with visibility toggle
                       _buildPasswordField(passwordController),
                       const SizedBox(height: 40),
-                      // Login Button
                       ElevatedButton(
                         onPressed: () async {
-                          // Handle login logic
                           if (emailController.text.trim().isNotEmpty &&
                               passwordController.text.trim().isNotEmpty) {
                             try {
@@ -136,11 +129,11 @@ class _LoginPageState extends State<LoginScreen> {
                                 context,
                                 length: ToastLength.medium,
                                 expandedHeight: 100,
-                                message: "Login Successfull 🥂!",
+                                message: "Login Successfull !",
                               );
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(builder: (context) {
-                                return const HomeScreen();
+                                return ProfileUpdatePage();
                               }));
                             } on FirebaseAuthException catch (error) {
                               ToastService.showWarningToast(
@@ -200,13 +193,12 @@ class _LoginPageState extends State<LoginScreen> {
                         text: "Sign Up",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.green, // You can customize the color
+                          color: Colors.green,
                           decoration:
-                              TextDecoration.underline, // Optional underline
+                              TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            // Add your SignUp tap action here
                             Navigator.push((context),
                                 MaterialPageRoute(builder: (context) {
                               return SignUpScreen();
@@ -214,16 +206,6 @@ class _LoginPageState extends State<LoginScreen> {
                           },
                       ),
                     ],
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-                // Footer
-                Text(
-                  "Powered by Shivam Khule",
-                  style: GoogleFonts.quicksand(
-                    fontSize: 12,
-                    color: Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 20),

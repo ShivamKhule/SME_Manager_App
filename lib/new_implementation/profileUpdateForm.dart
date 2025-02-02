@@ -7,6 +7,9 @@ import 'dart:io';
 
 import 'package:provider/provider.dart';
 
+import '../db_helper.dart';
+import '../model/ProfileModel.dart';
+
 class ProfileUpdatePage extends StatefulWidget {
   @override
   _ProfileUpdatePageState createState() => _ProfileUpdatePageState();
@@ -61,15 +64,13 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
 
     showDialog(
       context: context,
-      barrierDismissible:
-          false, // Prevents closing the dialog by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
           return Dialog(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation:
-                12, // Adds shadow to the dialog for a more elevated effect
+            elevation: 12,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: SingleChildScrollView(
@@ -90,8 +91,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     _buildPopupTextField("Landmark", landmarkController),
                     _buildPopupTextField("City", cityController),
                     _buildPopupTextField("Pincode", pincodeController),
-
-                    // State Dropdown
                     DropdownButtonFormField<String>(
                       value: selectedState.isEmpty ? null : selectedState,
                       decoration: _dropdownStyle("Select State"),
@@ -111,7 +110,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    // District Dropdown
                     DropdownButtonFormField<String>(
                       value: selectedDistrict.isEmpty ? null : selectedDistrict,
                       decoration: _dropdownStyle("Select District"),
@@ -129,7 +127,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         });
                       },
                     ),
-
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -252,15 +249,14 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           'pincode': pincode,
         },
         'profile_image': imageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
       });
 
-      companyNameController.clear();
-      ownerNameController.clear();
-      gstinController.clear();
-      mobileController.clear();
-      businessDomainController.clear();
-      addressController.clear();
+      // companyNameController.clear();
+      // ownerNameController.clear();
+      // gstinController.clear();
+      // mobileController.clear();
+      // businessDomainController.clear();
+      // addressController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully!")),
@@ -273,9 +269,40 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     }
   }
 
+  Future<void> updateProfileLocalDatabse() async {
+    try {
+      String? imageUrl;
+      if (_image != null) {
+        imageUrl = await _uploadImageToFirebase(_image!);
+      }
+      DatabaseHelper dbHelper = DatabaseHelper();
+
+      ProfileModel profile = ProfileModel(
+        companyName: companyNameController.text,
+        ownerName: ownerNameController.text,
+        gstin: gstinController.text,
+        mobile: mobileController.text,
+        businessDomain: businessDomainController.text,
+        addressLine1: addressLine1,
+        addressLine2: addressLine2,
+        landmark: landmark,
+        city: city,
+        district: selectedDistrict,
+        state: selectedState,
+        pincode: pincode,
+        profileImage: imageUrl!,
+      );
+      await dbHelper.insertData(profile);
+      await dbHelper.updateData(profile);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     companyNameController.clear();
     ownerNameController.clear();
@@ -386,7 +413,9 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
+                  updateProfileLocalDatabse();
                   _saveDataToFirestore();
+                  
                   setState(() {});
                 },
                 style: ElevatedButton.styleFrom(
