@@ -21,7 +21,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController ownerNameController = TextEditingController();
   final TextEditingController gstinController = TextEditingController();
-  // final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController businessDomainController =
       TextEditingController();
@@ -189,7 +188,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  // _dropdownStyle enhancement for uniformity
   InputDecoration _dropdownStyle(String label) {
     return InputDecoration(
       labelText: label,
@@ -207,7 +205,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  // code to Store the image at Firebase Storage
   Future<String?> _uploadImageToFirebase(File imageFile) async {
     try {
       String fileName =
@@ -221,7 +218,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     }
   }
 
-  // Function to send data at Firebase Firestore
   Future<void> _saveDataToFirestore() async {
     try {
       String? imageUrl;
@@ -229,27 +225,52 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         imageUrl = await _uploadImageToFirebase(_image!);
       }
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
-          .set({
+      // await FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+      //     .set({
+      //   'company_name': companyNameController.text,
+      //   'owner_name': ownerNameController.text,
+      //   'gstin': gstinController.text,
+      //   'mobile': mobileController.text,
+      //   'business_domain': businessDomainController.text,
+      //   'address': {
+      //     'line1': addressLine1,
+      //     'line2': addressLine2,
+      //     'landmark': landmark,
+      //     'city': city,
+      //     'district': selectedDistrict,
+      //     'state': selectedState,
+      //     'pincode': pincode,
+      //   },
+      //   'profile_image': imageUrl,
+      // });
+
+      Map<String, dynamic> profileData = {
         'company_name': companyNameController.text,
         'owner_name': ownerNameController.text,
         'gstin': gstinController.text,
-        // 'email': emailController.text,
+        'email': Provider.of<Logindetails>(context, listen: false).userEmail,
         'mobile': mobileController.text,
         'business_domain': businessDomainController.text,
-        'address': {
-          'line1': addressLine1,
-          'line2': addressLine2,
-          'landmark': landmark,
-          'city': city,
-          'district': selectedDistrict,
-          'state': selectedState,
-          'pincode': pincode,
-        },
+        'address_line1': addressLine1,
+        'address_line2': addressLine2,
+        'landmark': landmark,
+        'city': city,
+        'district': selectedDistrict,
+        'state': selectedState,
+        'pincode': pincode,
         'profile_image': imageUrl,
-      });
+      };
+
+      // Save to Firebase
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+          .set(profileData);
+
+      // Save to Local Database (SQLite)
+      await DBHelper().insertProfile(profileData);
 
       // companyNameController.clear();
       // ownerNameController.clear();
@@ -262,38 +283,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         const SnackBar(content: Text("Profile updated successfully!")),
       );
       Navigator.of(context).pushReplacementNamed("/home");
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
-      );
-    }
-  }
-
-  Future<void> updateProfileLocalDatabse() async {
-    try {
-      String? imageUrl;
-      if (_image != null) {
-        imageUrl = await _uploadImageToFirebase(_image!);
-      }
-      DatabaseHelper dbHelper = DatabaseHelper();
-
-      ProfileModel profile = ProfileModel(
-        companyName: companyNameController.text,
-        ownerName: ownerNameController.text,
-        gstin: gstinController.text,
-        mobile: mobileController.text,
-        businessDomain: businessDomainController.text,
-        addressLine1: addressLine1,
-        addressLine2: addressLine2,
-        landmark: landmark,
-        city: city,
-        district: selectedDistrict,
-        state: selectedState,
-        pincode: pincode,
-        profileImage: imageUrl!,
-      );
-      await dbHelper.insertData(profile);
-      await dbHelper.updateData(profile);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${e.toString()}")),
@@ -322,12 +311,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        // flexibleSpace: Container(
-        //   decoration: const BoxDecoration(
-        //     gradient:
-        //         LinearGradient(colors: [Colors.deepPurple, Colors.indigo]),
-        //   ),
-        // ),
         backgroundColor: Colors.blue,
         elevation: 4,
         shadowColor: Colors.black.withOpacity(0.3),
@@ -413,9 +396,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  updateProfileLocalDatabse();
                   _saveDataToFirestore();
-                  
                   setState(() {});
                 },
                 style: ElevatedButton.styleFrom(

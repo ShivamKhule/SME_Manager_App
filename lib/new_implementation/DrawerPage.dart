@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:firebase_connect/SME_Manager/AuthScreen.dart';
+import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/dashboard.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Drawerpage extends StatefulWidget {
   const Drawerpage({super.key});
@@ -18,8 +22,14 @@ class _DrawerPageState extends State {
     });
   }
 
-  ListTile buildDrawerItem(IconData icon, String title,
-      {Widget? page, IconData? add, Color? color}) {
+  ListTile buildDrawerItem(
+    IconData icon,
+    String title, {
+    Widget? page,
+    IconData? add,
+    Color? color,
+    VoidCallback? function, // Optional function argument
+  }) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(
@@ -29,21 +39,35 @@ class _DrawerPageState extends State {
           fontWeight: FontWeight.w700,
         ),
       ),
-      trailing: GestureDetector(
-        onTap: () {},
-        child: Icon(
-          add,
-          color: Colors.black87,
-        ),
-      ),
+      trailing: add != null
+          ? GestureDetector(
+              onTap: () {},
+              child: Icon(add, color: Colors.black87),
+            )
+          : null,
       onTap: () {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => page!,
-          ),
-        );
+        if (function != null) {
+          function();
+        } else if (page != null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => page),
+          );
+        }
       },
     );
+  }
+
+  void _logout() async {
+    log("User logged out.");
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -118,12 +142,8 @@ class _DrawerPageState extends State {
               page: const ManageStaffScreen()),
           const Divider(),
           buildDrawerItem(Icons.settings, 'Settings', color: Colors.blueAccent),
-          buildDrawerItem(
-            Icons.logout,
-            'Log Out',
-            // page: LoginPage(toggleView: toggleView),
-            color: Colors.red,
-          ),
+          buildDrawerItem(Icons.logout, 'Log Out',
+              color: Colors.red, function: _logout),
         ],
       ),
     );

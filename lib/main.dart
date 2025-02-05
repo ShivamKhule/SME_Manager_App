@@ -2,6 +2,7 @@ import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/ProfileScreen.dart';
+import 'package:firebase_connect/new_implementation/SplashScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
@@ -18,8 +19,8 @@ import 'new_implementation/sales.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  DatabaseHelper dbHelper = DatabaseHelper();
-  await dbHelper.initDatabase();
+  // DatabaseHelper dbHelper = DatabaseHelper();
+  // await dbHelper.initDatabase();
   runApp(const MyApp());
 }
 
@@ -33,22 +34,21 @@ class MyApp extends StatelessWidget {
         return Logindetails(userEmail: '');
       },
       child: MaterialApp(
-        initialRoute: '/login',
+        initialRoute: '/splash',
         // initialRoute: '/home',
         routes: {
+          '/splash': (context) => const SplashScreen(),
           '/login': (context) => LoginScreen(),
           '/home': (context) => const HomeScreen(),
           '/sales': (context) => SalesScreen(),
           '/purchase': (context) => SalesScreen(),
           '/reports': (context) => ReportsScreen(),
-
           '/addSalesOwner': (context) => AddSalesOwnerScreen(),
           '/addProduct': (context) => AddProductScreen(orderPath: ''),
           '/categories': (context) => Categories(),
           '/managestaff': (context) => const ManageStaffScreen(),
           '/profileUpdate': (context) => ProfileUpdatePage(),
           '/profileScreen': (context) => const ProfileScreenNew(),
-
         },
       ),
     );
