@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/DrawerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,34 +18,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String gstin = "27ABCDE1234F1Z5";
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
   final List<Map<String, String>> categories = [
     {
-      "imageUrl":
-          "assets/images/products/chair.jpg",
+      "imageUrl": "assets/images/products/chair.jpg",
       "categoryName": "Electronics"
     },
     {
-      "imageUrl":
-          "assets/images/products/cupboard.jpg",
+      "imageUrl": "assets/images/products/cupboard.jpg",
       "categoryName": "Furniture"
     },
     {
-      "imageUrl":
-          "assets/images/products/showcase.jpg",
+      "imageUrl": "assets/images/products/showcase.jpg",
       "categoryName": "Furniture"
     },
     {
-      "imageUrl":
-          "assets/images/products/dinnerset.jpg",
+      "imageUrl": "assets/images/products/dinnerset.jpg",
       "categoryName": "Electronics"
     },
     {
-      "imageUrl":
-          "assets/images/products/sofa.jpg",
+      "imageUrl": "assets/images/products/sofa.jpg",
       "categoryName": "Electronics"
     },
   ];
@@ -119,15 +115,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<String> userEmail() async{
+  Future<String> userEmail() async {
     String userEmail = Provider.of<Logindetails>(context).userEmail;
-    log("email : $userEmail");
     return userEmail;
+  }
+
+  DBHelper dbHelper = DBHelper();
+
+  dynamic data;
+  Future<void> profileData() async {
+    data = await dbHelper.getProfile();
+    log("Fetched Data: $data");
+    setState(() {});
+  }
+
+  dynamic detailsData;
+  void getProfileDetails() async {
+    final detailsSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+        .get();
+
+    if (detailsSnapshot.exists) {
+      setState(() {
+        detailsData = detailsSnapshot.data();
+      });
+      log("Data on Home Screen: $detailsData");
+      
+    } else {
+      log("Document does not exist.");
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    getProfileDetails();
+    profileData();
   }
 
   @override
@@ -135,10 +159,13 @@ class _HomeScreenState extends State<HomeScreen> {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
 
+    double? salesAmt = Provider.of<Logindetails>(context).salesAmt ?? 00;
+    double? purchaseAmt = Provider.of<Logindetails>(context).purchaseAmt ?? 00;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Dashboard',
+          'Udyog Karya',
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -175,7 +202,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(left: screenWidth * 0.04, right: screenWidth * 0.04, bottom: screenWidth * 0.045),
+          padding: EdgeInsets.only(
+              left: screenWidth * 0.04,
+              right: screenWidth * 0.04,
+              bottom: screenWidth * 0.045),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -204,6 +234,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     CircleAvatar(
                       radius: screenWidth * 0.1,
+                      backgroundImage: detailsData != null &&
+                              detailsData['profile_image'] != null
+                          ? NetworkImage(detailsData['profile_image'])
+                          : null,
+                      backgroundColor: Colors
+                          .grey[300], // Fallback color when no image is found
+                      child: detailsData == null ||
+                              detailsData['profile_image'] == null
+                          ? Icon(Icons.person,
+                              size: screenWidth * 0.1, color: Colors.white)
+                          : null, // Show icon if no image is found
                     ),
                     SizedBox(width: screenWidth * 0.04),
                     Expanded(
@@ -211,8 +252,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            // "R. K. Enterprises",
-                            Provider.of<Logindetails>(context, listen: false).userEmail,
+                            detailsData != null
+                                ? detailsData['company_name'] ?? "Loading..."
+                                : "Data Not Found",
                             style: TextStyle(
                               fontSize: screenWidth * 0.05,
                               fontWeight: FontWeight.bold,
@@ -220,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           Text(
-                            "GSTIN: $gstin",
+                            "GSTIN: ${detailsData != null ? detailsData["gstin"] ?? "N/A" : "Data Not Found"}",
                             style: TextStyle(
                               fontSize: screenWidth * 0.035,
                               color: Colors.white,
@@ -254,10 +296,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     end: Alignment.bottomLeft,
                   ),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(
+                    const ListTile(
                       title: Text(
                         "Sales and Purchase Overview",
                         style: TextStyle(
@@ -265,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       trailing: Icon(Icons.bar_chart, color: Colors.teal),
                     ),
-                    Divider(
+                    const Divider(
                       thickness: 1,
                       color: Colors.black,
                     ),
@@ -274,13 +316,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         StatCard(
                           title: "Total Sales",
-                          amount: "₹50,000",
+                          amount: "₹ $salesAmt",
                           icon: Icons.attach_money,
                           color: Colors.green,
                         ),
                         StatCard(
                           title: "Total Purchase",
-                          amount: "₹30,000",
+                          amount: "₹ $purchaseAmt",
                           icon: Icons.shopping_cart,
                           color: Colors.orange,
                         ),
@@ -474,11 +516,10 @@ class CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: const [
             BoxShadow(
-              color: Colors.black45,
-              blurRadius: 10,
-              offset: Offset(0, 3),
-              spreadRadius: 3
-            ),
+                color: Colors.black45,
+                blurRadius: 10,
+                offset: Offset(0, 3),
+                spreadRadius: 3),
           ],
           image: DecorationImage(
             // image: NetworkImage(imageUrl),
@@ -502,9 +543,6 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
-
-
-
 
 // import 'dart:developer';
 

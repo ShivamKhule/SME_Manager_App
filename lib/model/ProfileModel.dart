@@ -4,6 +4,7 @@ class ProfileModel {
   String gstin;
   String mobile;
   String businessDomain;
+  String address;
   String addressLine1;
   String addressLine2;
   String landmark;
@@ -19,6 +20,7 @@ class ProfileModel {
     required this.gstin,
     required this.mobile,
     required this.businessDomain,
+    required this.address,
     required this.addressLine1,
     required this.addressLine2,
     required this.landmark,
@@ -37,6 +39,7 @@ class ProfileModel {
       'gstin': gstin,
       'mobile': mobile,
       'business_domain': businessDomain,
+      'address': address,
       'address_line1': addressLine1,
       'address_line2': addressLine2,
       'landmark': landmark,

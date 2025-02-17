@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_connect/Generate_PDF/page/pdf_page.dart';
 import 'package:firebase_connect/controller/LoginDetails.dart';
@@ -24,6 +26,14 @@ class OrderDetailsScreen extends StatefulWidget {
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   bool _showProducts = true; // Controls whether the products table is shown
+
+  double priceSum = 0;
+  dynamic date;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +83,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${widget.orderId}',
+                          widget.orderId,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -82,6 +92,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         ),
                         const SizedBox(height: 10),
                         ...data.entries.map((entry) {
+                          if (entry.key == 'orderDate') {
+                            date = entry.value.toString();
+                          }
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: Row(
@@ -139,11 +152,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        // Retrieve product data from Firestore
                         final productsSnapshot = await FirebaseFirestore
                             .instance
                             .collection('users')
-                            .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+                            .doc(Provider.of<Logindetails>(context,
+                                    listen: false)
+                                .userEmail)
                             .collection('sales')
                             .doc(widget.ownerId)
                             .collection('orders')
@@ -152,8 +166,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             .get();
 
                         // Map Firestore data to InvoiceItem objects
+                        priceSum = 0;
                         final products = productsSnapshot.docs.map((doc) {
                           final data = doc.data();
+                          priceSum += (data['price'] * data['quantity']) ?? 0.0;
                           return InvoiceItem(
                             description: data['name'] ?? '',
                             date: DateTime.now(),
@@ -163,9 +179,43 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           );
                         }).toList();
 
+                        // Provider.of<Logindetails>(context, listen: false)
+                        //     .setSalesAmt(priceSum);
+                        // final salesAmtSnapshot = await FirebaseFirestore
+                        //     .instance
+                        //     .collection('users')
+                        //     .doc(Provider.of<Logindetails>(context,
+                        //             listen: false)
+                        //         .userEmail)
+                        //     .get();
+
+                        // dynamic salesAmtFirebase =
+                        //     salesAmtSnapshot.get("salesAmt");
+
+                        // if (salesAmtFirebase is num) {
+                        //   salesAmtFirebase += priceSum;
+
+                        //   await FirebaseFirestore.instance
+                        //       .collection('users')
+                        //       .doc(Provider.of<Logindetails>(context,
+                        //               listen: false)
+                        //           .userEmail)
+                        //       .update({"salesAmt": salesAmtFirebase});
+
+                        //   log("Updated salesAmt: $salesAmtFirebase");
+                        // } else {
+                        //   log("salesAmt is not a number, cannot perform addition.");
+                        // }
+
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
-                          return PdfPage(items: products);
+                          log("$priceSum");
+                          return PdfPage(
+                              items: products,
+                              owner: widget.ownerId,
+                              order: widget.orderId,
+                              totalAmt: priceSum,
+                              date: date);
                         }));
                       },
                       style: ElevatedButton.styleFrom(
@@ -187,7 +237,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
                 // Products Table Section
                 if (_showProducts)
                   Expanded(
@@ -200,7 +249,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           return const Center(
                               child: CircularProgressIndicator());
                         }
-
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return const Center(
                             child: Text(
@@ -214,7 +262,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
                         return SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          child: Container(
+                          child: SizedBox(
                             width: MediaQuery.of(context).size.width,
                             child: Card(
                               elevation: 5.0,
@@ -225,8 +273,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: DataTable(
                                   columnSpacing: 20.0,
-                                  headingRowColor:
-                                      WidgetStateColor.resolveWith(
+                                  headingRowColor: WidgetStateColor.resolveWith(
                                     (states) =>
                                         // ignore: deprecated_member_use
                                         Colors.blueAccent.withOpacity(0.1),
@@ -269,7 +316,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     return DataRow(cells: [
                                       DataCell(Text(index.toString())),
                                       DataCell(Text(product['name'])),
-                                      DataCell(Text('\$${product['price']}')),
+                                      DataCell(Text('₹ ${product['price']}')),
                                       DataCell(
                                           Text(product['quantity'].toString())),
                                     ]);
@@ -287,44 +334,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           );
         },
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     // Retrieve product data from Firestore
-      //     final productsSnapshot = await FirebaseFirestore.instance
-      //         .collection('users')
-      //         .doc('username1')
-      //         .collection('sales')
-      //         .doc(widget.ownerId)
-      //         .collection('orders')
-      //         .doc(widget.orderId)
-      //         .collection('products')
-      //         .get();
-
-      //     // Map Firestore data to InvoiceItem objects
-      //     final products = productsSnapshot.docs.map((doc) {
-      //       final data = doc.data();
-      //       return InvoiceItem(
-      //         description: data['name'] ?? '',
-      //         date: DateTime.now(),
-      //         quantity: data['quantity'] ?? 0,
-      //         vat: 0.18, // Assuming a default VAT value of 18%
-      //         unitPrice: data['price']?.toDouble() ?? 0.0,
-      //       );
-      //     }).toList();
-
-      //     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      //       return PdfPage(items: products);
-      //     }));
-      //   },
-      //   child: const Text(
-      //     "PDF",
-      //     style: TextStyle(
-      //       color: Colors.purple,
-      //       fontSize: 18,
-      //       fontWeight: FontWeight.w600,
-      //     ),
-      //   ),
-      // ),
     );
   }
 }

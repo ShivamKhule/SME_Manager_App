@@ -1,11 +1,11 @@
 import 'package:firebase_connect/controller/LoginDetails.dart';
-import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/ProfileScreen.dart';
 import 'package:firebase_connect/new_implementation/SplashScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
+import 'package:firebase_connect/new_implementation/purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => LoginScreen(),
           '/home': (context) => const HomeScreen(),
           '/sales': (context) => SalesScreen(),
-          '/purchase': (context) => SalesScreen(),
+          '/purchase': (context) => PurchaseScreen(),
           '/reports': (context) => ReportsScreen(),
           '/addSalesOwner': (context) => AddSalesOwnerScreen(),
           '/addProduct': (context) => AddProductScreen(orderPath: ''),

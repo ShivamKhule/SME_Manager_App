@@ -1,16 +1,29 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_connect/Generate_PDF/api/pdf_api.dart';
 import 'package:firebase_connect/Generate_PDF/api/pdf_invoice_api.dart';
 import 'package:firebase_connect/Generate_PDF/model/customer.dart';
 import 'package:firebase_connect/Generate_PDF/model/invoice.dart';
 import 'package:firebase_connect/Generate_PDF/model/supplier.dart';
+import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_connect/db_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class PdfPage extends StatefulWidget {
   final List<InvoiceItem> items;
+  // final String partyname;
+  // final String partygstin;
+  // final String partynumber;
+  // final String partyaddress;
+  final String? owner;
+  final String? order;
+  final double? totalAmt;
+  final dynamic date;
 
-  const PdfPage(
-      {super.key, required this.items});
+  const PdfPage({super.key, required this.items, this.owner, this.order, this.totalAmt, this.date});
 
   @override
   State<PdfPage> createState() => _PdfPageState();
@@ -21,24 +34,62 @@ class _PdfPageState extends State<PdfPage> {
 
   List<int>? pdfFile;
 
+  DBHelper dbHelper = DBHelper();
+
+  dynamic data;
+
+  Future<void> profileData() async {
+    data = await dbHelper.getProfile();
+    log("Fetched Data: $data");
+    setState(() {});
+  }
+
+  dynamic detailsData;
+
+  Future<void> getDetails() async {
+    final detailsSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+        .collection('sales')
+        .doc(widget.owner)
+        .get();
+
+    if (detailsSnapshot.exists) {
+      setState(() {
+        detailsData = detailsSnapshot.data();
+      });
+      log("Data on PDF page: $detailsData");
+    } else {
+      log("Document does not exist.");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    profileData();
+    getDetails();
+  }
+
   void handleDownload() async {
     final date = DateTime.now();
     final dueDate = date.add(const Duration(days: 7));
 
     final invoice = Invoice(
-      supplier: const Supplier(
-        name: 'R.K. Enterprises',
-        address: 'JM Road, Sambhajinagar, Maharashtra 411023',
-        paymentInfo: 'https://paypal.me/sarahfieldzz',
+      supplier: Supplier(
+        name: data['company_name'] ?? "Loading...",
+        address: data['address'],
+        // paymentInfo: 'https://paypal.me/sarahfieldzz',
       ),
-      customer: const Customer(
-        name: 'Patil Furnitures',
-        address: 'Jadhav Colony, Sambhajinagar, Maharashtra 411023',
+      customer: Customer(
+        name: detailsData['ownerName'],
+        address: detailsData['wholeaddress'],
       ),
       info: InvoiceInfo(
         date: date,
         dueDate: dueDate,
-        description: 'Furniture Material Order',
+        description: widget.order!,
         number: '${DateTime.now().year}-9478',
       ),
       items: widget.items, // Access the items here
@@ -48,7 +99,6 @@ class _PdfPageState extends State<PdfPage> {
       final pdfFile = await PdfInvoiceApi.generate(invoice);
       await PdfApi.openFile(pdfFile);
     } catch (e) {
-      // Handle any errors (e.g., file generation or opening errors)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
@@ -61,14 +111,14 @@ class _PdfPageState extends State<PdfPage> {
       final dueDate = date.add(const Duration(days: 7));
 
       final invoice = Invoice(
-        supplier: const Supplier(
-          name: 'R.K. Enterprises',
-          address: 'JM Road, Sambhajinagar, Maharashtra 411023',
-          paymentInfo: 'https://paypal.me/sarahfieldzz',
+        supplier: Supplier(
+          name: data['company_name'] ?? "Loading...",
+          address: data['address'],
+          // paymentInfo: 'https://paypal.me/sarahfieldzz',
         ),
-        customer: const Customer(
-          name: 'Patil Furnitures',
-          address: 'Jadhav Colony, Sambhajinagar, Maharashtra 411023',
+        customer: Customer(
+          name: detailsData['ownerName'],
+          address: detailsData['wholeaddress'],
         ),
         info: InvoiceInfo(
           date: date,
@@ -156,7 +206,6 @@ class _PdfPageState extends State<PdfPage> {
     );
   }
 
-  // Helper Widget for Party Information Card
   Widget _buildPartyInfoCard() {
     return Card(
       elevation: 6,
@@ -176,32 +225,32 @@ class _PdfPageState extends State<PdfPage> {
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Party Name: ABC Pvt Ltd",
-                    style: TextStyle(
+                    "Party Name: ${detailsData != null ? detailsData['ownerName'] : "Loading..."}",
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    "GSTIN: 27ABCDE1234F1Z5",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    "GSTIN: ${detailsData != null ? detailsData['gstin'] : "Loading..."}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    "Contact: +91 9876543210",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    "Contact: ${detailsData != null ? detailsData['mobile'] : "Loading..."}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    "Address: 123, Main Street, City, State, 123456",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    "Address: ${detailsData != null ? detailsData['wholeaddress'] : "Loading..."}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
@@ -211,6 +260,62 @@ class _PdfPageState extends State<PdfPage> {
       ),
     );
   }
+
+  // // Helper Widget for Party Information Card
+  // Widget _buildPartyInfoCard() {
+  //   return Card(
+  //     elevation: 6,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Row(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           CircleAvatar(
+  //             radius: 28,
+  //             backgroundColor: const Color(0xFF6A11CB).withOpacity(0.1),
+  //             child: const Icon(
+  //               Icons.business,
+  //               color: Color(0xFF6A11CB),
+  //               size: 28,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 16),
+  //           Expanded(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   "Party Name: ${detailsData['ownerName']}" ?? "Loading...",
+  //                   style: const TextStyle(
+  //                     fontSize: 16,
+  //                     fontWeight: FontWeight.bold,
+  //                     color: Colors.black87,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 8),
+  //                 Text(
+  //                   "GSTIN: ${detailsData['gstin']}",
+  //                   style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                 ),
+  //                 const SizedBox(height: 8),
+  //                 Text(
+  //                   "Contact: ${detailsData['mobile']}",
+  //                   style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                 ),
+  //                 const SizedBox(height: 8),
+  //                 Text(
+  //                   "Address: ${detailsData['wholeaddress']}",
+  //                   style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // Helper Widget for Order Information Card
   Widget _buildOrderInfoCard() {
@@ -236,18 +341,18 @@ class _PdfPageState extends State<PdfPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Total Amount: ₹10,000",
-                    style: TextStyle(
+                  Text(
+                    "Total Amount: ₹ ${widget.totalAmt}",
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Order Date: 20th Jan 2025",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  Text(
+                    "Order Date: ${widget.date}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
                   Row(

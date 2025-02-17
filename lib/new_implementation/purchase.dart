@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 
 import 'orders.dart';
 
-class SalesScreen extends StatefulWidget {
+class PurchaseScreen extends StatefulWidget {
   @override
-  _SalesScreenState createState() => _SalesScreenState();
+  _PurchaseScreenState createState() => _PurchaseScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen> {
+class _PurchaseScreenState extends State<PurchaseScreen> {
   String searchQuery = "";
   final FocusNode _searchFocusNode = FocusNode();
 
@@ -199,126 +199,8 @@ class _SalesScreenState extends State<SalesScreen> {
     );
   }
 
-  // void showAddSalesOwnerDialog(BuildContext context) {
-  //   final TextEditingController ownerNameController = TextEditingController();
-  //   final TextEditingController gstinController = TextEditingController();
-  //   final TextEditingController mobileController = TextEditingController();
-  //   final TextEditingController businessDomainController =
-  //       TextEditingController();
-  //   // final TextEditingController addressController = TextEditingController();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(15),
-  //         ),
-  //         title: const Text(
-  //           'Add Sales Party',
-  //           style: TextStyle(
-  //             fontFamily: 'Quicksand',
-  //             fontSize: 20,
-  //             fontWeight: FontWeight.bold,
-  //           ),
-  //         ),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             TextField(
-  //               controller: ownerNameController,
-  //               decoration: InputDecoration(
-  //                 labelText: 'Party Name',
-  //                 labelStyle: const TextStyle(
-  //                   fontFamily: 'Quicksand',
-  //                   fontSize: 16,
-  //                 ),
-  //                 border: OutlineInputBorder(
-  //                   borderRadius: BorderRadius.circular(10),
-  //                 ),
-  //               ),
-  //             ),
-  //             _buildTextField(
-  //                 "GSTIN", gstinController, Icons.confirmation_number),
-  //             _buildTextField("Mobile", mobileController, Icons.phone),
-  //             _buildTextField(
-  //                 "Business Domain", businessDomainController, Icons.domain),
-  //             GestureDetector(
-  //               onTap: openAddressDialog,
-  //               child: AbsorbPointer(
-  //                 child: TextField(
-  //                   controller: addressController,
-  //                   decoration: InputDecoration(
-  //                     labelText: "Address",
-  //                     hintText: "Click to enter address",
-  //                     filled: true,
-  //                     fillColor: Colors.grey[100],
-  //                     border: OutlineInputBorder(
-  //                       borderRadius: BorderRadius.circular(12),
-  //                     ),
-  //                     suffixIcon: const Icon(Icons.location_on,
-  //                         color: Colors.deepPurple),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             ElevatedButton(
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: Colors.blueAccent,
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(10),
-  //                 ),
-  //               ),
-  //               onPressed: () {
-  //                 final ownerName = ownerNameController.text.trim();
-  //                 if (ownerName.isNotEmpty) {
-  //                   FirebaseFirestore.instance
-  //                       .collection('users')
-  //                       .doc(Provider.of<Logindetails>(context, listen: false)
-  //                           .userEmail)
-  //                       .collection('sales')
-  //                       .doc(ownerName)
-  //                       .set(
-  //                     {
-  //                       'ownerName': ownerName,
-  //                       'gstin': gstinController.text.trim(),
-  //                       'mobile': mobileController.text.trim(),
-  //                       'businessDomain': businessDomainController.text.trim(),
-  //                       'address': {
-  //                         'line1': addressLine1,
-  //                         'line2': addressLine2,
-  //                         'landmark': landmark,
-  //                         'city': city,
-  //                         'district': selectedDistrict,
-  //                         'state': selectedState,
-  //                         'pincode': pincode,
-  //                       },
-  //                       'wholeaddress': addressController.text.trim(),
-  //                     },
-  //                   );
-
-  //                   Navigator.pop(context);
-  //                 }
-  //               },
-  //               child: const Text(
-  //                 'Add Party',
-  //                 style: TextStyle(
-  //                     fontFamily: 'Quicksand',
-  //                     fontSize: 18,
-  //                     fontWeight: FontWeight.w500,
-  //                     color: Colors.white),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   void showAddSalesOwnerBottomSheet(BuildContext context) {
-    final TextEditingController ownerNameController = TextEditingController();
+    final TextEditingController supplierNameController = TextEditingController();
     final TextEditingController gstinController = TextEditingController();
     final TextEditingController mobileController = TextEditingController();
     final TextEditingController businessDomainController =
@@ -343,7 +225,7 @@ class _SalesScreenState extends State<SalesScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Add Sales Party',
+                  'Add Supplier',
                   style: TextStyle(
                     fontFamily: 'Quicksand',
                     fontSize: 22,
@@ -353,7 +235,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 ),
                 const SizedBox(height: 10),
                 _buildTextField(
-                    "Party Name", ownerNameController, Icons.person),
+                    "Supplier Name", supplierNameController, Icons.person),
                 _buildTextField(
                     "GSTIN", gstinController, Icons.confirmation_number),
                 _buildTextField("Mobile", mobileController, Icons.phone),
@@ -388,16 +270,16 @@ class _SalesScreenState extends State<SalesScreen> {
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   onPressed: () {
-                    final ownerName = ownerNameController.text.trim();
-                    if (ownerName.isNotEmpty) {
+                    final supplierName = supplierNameController.text.trim();
+                    if (supplierName.isNotEmpty) {
                       FirebaseFirestore.instance
                           .collection('users')
                           .doc(Provider.of<Logindetails>(context, listen: false)
                               .userEmail)
-                          .collection('sales')
-                          .doc(ownerName)
+                          .collection('purchase')
+                          .doc(supplierName)
                           .set({
-                        'ownerName': ownerName,
+                        'supplierName': supplierName,
                         'gstin': gstinController.text.trim(),
                         'mobile': mobileController.text.trim(),
                         'businessDomain': businessDomainController.text.trim(),
@@ -408,7 +290,7 @@ class _SalesScreenState extends State<SalesScreen> {
                     }
                   },
                   child: const Text(
-                    'Add Party',
+                    'Add Supplier',
                     style: TextStyle(
                       fontFamily: 'Quicksand',
                       fontSize: 18,
@@ -431,7 +313,7 @@ class _SalesScreenState extends State<SalesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Sales',
+          'Purchase',
           style: TextStyle(
               // fontFamily: 'Quicksand',
               fontSize: 28,
@@ -452,7 +334,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search Party...',
+                hintText: 'Search Supplier...',
                 hintStyle: const TextStyle(
                   fontFamily: 'Quicksand',
                   fontSize: 16,
@@ -468,7 +350,7 @@ class _SalesScreenState extends State<SalesScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection(
-                      'users/${Provider.of<Logindetails>(context).userEmail}/sales')
+                      'users/${Provider.of<Logindetails>(context).userEmail}/purchase')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -511,7 +393,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             MaterialPageRoute(
                               builder: (context) => OrdersScreen(
                                 collectionPath:
-                                    'users/${Provider.of<Logindetails>(context).userEmail}/sales/${data[index].id}/orders',
+                                    'users/${Provider.of<Logindetails>(context).userEmail}/purchase/${data[index].id}/orders',
                                 ownerId: data[index].id,
                               ),
                             ),
@@ -537,46 +419,6 @@ class _SalesScreenState extends State<SalesScreen> {
     );
   }
 
-  // Widget _buildTextField(
-  //     String label, TextEditingController controller, IconData icon) {
-  //   return Padding(
-  //     padding:
-  //         const EdgeInsets.only(bottom: 16.0), // Increased space for clarity
-  //     child: TextField(
-  //       controller: controller,
-  //       decoration: InputDecoration(
-  //         labelText: label,
-  //         labelStyle: const TextStyle(
-  //           color: Colors.deepPurple,
-  //           fontWeight: FontWeight.bold,
-  //         ),
-  //         prefixIcon: Icon(icon, color: Colors.deepPurple),
-  //         filled: true,
-  //         fillColor:
-  //             Colors.white, // Lightened background color for better contrast
-  //         contentPadding: const EdgeInsets.symmetric(
-  //             vertical: 14, horizontal: 12), // Improved padding
-  //         border: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //           borderSide: BorderSide(
-  //               color: Colors.deepPurple.shade200,
-  //               width: 1), // Lighter border color
-  //         ),
-  //         focusedBorder: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //           borderSide: const BorderSide(
-  //               color: Colors.deepPurple,
-  //               width: 2), // Highlight border on focus
-  //         ),
-  //         enabledBorder: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //           borderSide: BorderSide(
-  //               color: Colors.deepPurple.shade100, width: 1), // Default border
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget _buildTextField(
       String label, TextEditingController controller, IconData icon) {
     return Padding(

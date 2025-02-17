@@ -67,7 +67,6 @@ class _ProfileScreenNewState extends State<ProfileScreenNew> {
     } catch (e) {
       print("Error fetching profile data: $e");
     }
-    log("$userData");
   }
 
   @override

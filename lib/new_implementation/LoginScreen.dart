@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_connect/controller/LoginDetails.dart';
+import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/SignUpScreen.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
 import 'package:provider/provider.dart';
@@ -124,6 +127,9 @@ class _LoginPageState extends State<LoginScreen> {
                               await saveUserCredentials(
                                   userCredential.user!.uid,
                                   userCredential.user!.email!);
+
+                                  dynamic localData =  await DBHelper().getProfile();
+                                  log("#Local Data in Login Screen : $localData");
 
                               ToastService.showSuccessToast(
                                 context,

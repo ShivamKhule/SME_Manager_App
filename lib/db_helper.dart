@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -25,6 +27,7 @@ class DBHelper {
             email TEXT,
             mobile TEXT,
             business_domain TEXT,
+            address TEXT,
             address_line1 TEXT,
             address_line2 TEXT,
             landmark TEXT,
