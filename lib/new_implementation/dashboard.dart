@@ -141,11 +141,29 @@ class _HomeScreenState extends State<HomeScreen> {
         detailsData = detailsSnapshot.data();
       });
       log("Data on Home Screen: $detailsData");
-      
     } else {
       log("Document does not exist.");
     }
+
+    // final salesData = await FirebaseFirestore.instance
+    //     .doc(
+    //         'users/${Provider.of<Logindetails>(context).userEmail}/sales/salesData')
+    //     .get();
+    try {
+      final salesData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+          .collection('sales')
+          .doc('salesData')
+          .get();
+      salesAmt = salesData.exists ? salesData.get('salesAmt') : null;
+    } catch (e) {
+      print('Error fetching sales data: $e');
+    }
   }
+
+  dynamic salesAmt;
+  dynamic salesAmtValue;
 
   @override
   void initState() {
@@ -159,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
 
-    double? salesAmt = Provider.of<Logindetails>(context).salesAmt ?? 00;
+    // double? salesAmt = Provider.of<Logindetails>(context).salesAmt ?? 00;
     double? purchaseAmt = Provider.of<Logindetails>(context).purchaseAmt ?? 00;
 
     return Scaffold(
@@ -316,7 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         StatCard(
                           title: "Total Sales",
-                          amount: "₹ $salesAmt",
+                          // amount: "₹ ${detailsData != null ? detailsData["salesAmt"] ?? "0.0" : "Data Not Found"}",
+                          amount: "$salesAmt",
                           icon: Icons.attach_money,
                           color: Colors.green,
                         ),

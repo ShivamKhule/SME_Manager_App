@@ -32,32 +32,120 @@ class _AddOrderWithProductsScreenState
     });
   }
 
+  // void saveOrderWithProducts() async {
+  //   final orderId = _orderIdController.text.trim();
+  //   final orderDate = _orderDateController.text.trim();
+
+  //   if (orderId.isNotEmpty && orderDate.isNotEmpty && products.isNotEmpty) {
+  //     final orderRef = FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+  //         .collection('sales')
+  //         .doc(widget.ownerId)
+  //         .collection('orders')
+  //         .doc(orderId);
+
+  //     try {
+  //       await orderRef.set({
+  //         'orderDate': orderDate,
+  //         'totalProducts': products.length,
+  //       });
+
+  //       for (var product in products) {
+  //         await orderRef.collection('products').add(product);
+  //       }
+
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //             content: Text('Order and products added successfully!')),
+  //       );
+
+  //       setState(() {
+  //         _orderIdController.clear();
+  //         _orderDateController.clear();
+  //         products.clear();
+  //       });
+
+  //       Navigator.pop(context);
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Failed to save order or products')),
+  //       );
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //           content:
+  //               Text('Please fill all fields and add at least one product')),
+  //     );
+  //   }
+  // }
   void saveOrderWithProducts() async {
     final orderId = _orderIdController.text.trim();
     final orderDate = _orderDateController.text.trim();
 
     if (orderId.isNotEmpty && orderDate.isNotEmpty && products.isNotEmpty) {
+      final userEmail =
+          Provider.of<Logindetails>(context, listen: false).userEmail;
       final orderRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
+          .doc(userEmail)
           .collection('sales')
           .doc(widget.ownerId)
           .collection('orders')
           .doc(orderId);
 
-      try {
-        await orderRef.set({
-          'orderDate': orderDate,
-          'totalProducts': products.length,
-        });
+      // Reference to a specific document in the sales collection to store salesAmt
+      final salesAmtRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userEmail)
+          .collection('sales')
+          .doc('salesData'); // Using a fixed document ID 'salesData'
 
+      try {
+        // Calculate total amount from products
+        double orderTotal = 0;
         for (var product in products) {
-          await orderRef.collection('products').add(product);
+          orderTotal += product['price'] * product['quantity'];
         }
+
+        // Use a transaction to update both order and salesAmt atomically
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          // Get current salesAmt from the sales document
+          final salesDoc = await transaction.get(salesAmtRef);
+
+          // Get existing salesAmt or default to 0 if it doesn't exist
+          double currentSalesAmt = 0;
+          if (salesDoc.exists) {
+            currentSalesAmt = (salesDoc.data()?['salesAmt'] ?? 0).toDouble();
+          }
+
+          // Save the order details
+          transaction.set(orderRef, {
+            'orderDate': orderDate,
+            'totalProducts': products.length,
+            'orderTotal': orderTotal,
+          });
+
+          // Update or set salesAmt in the sales document
+          transaction.set(
+              salesAmtRef,
+              {
+                'salesAmt': currentSalesAmt + orderTotal,
+              },
+              SetOptions(
+                  merge:
+                      true)); // Using merge to update existing doc or create if doesn't exist
+
+          // Add products to subcollection
+          for (var product in products) {
+            await orderRef.collection('products').add(product);
+          }
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Order and products added successfully!')),
+              content: Text('Order and sales amount updated successfully!')),
         );
 
         setState(() {
@@ -69,7 +157,7 @@ class _AddOrderWithProductsScreenState
         Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save order or products')),
+          SnackBar(content: Text('Failed to save order: $e')),
         );
       }
     } else {
@@ -94,7 +182,11 @@ class _AddOrderWithProductsScreenState
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Add Order with Products', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),),
+        title: const Text(
+          'Add Order with Products',
+          style: TextStyle(
+              color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
+        ),
         backgroundColor: Colors.blueAccent,
       ),
       body: SingleChildScrollView(
@@ -114,8 +206,8 @@ class _AddOrderWithProductsScreenState
                   children: [
                     const Text(
                       'Order Details',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
                       height: 6,
@@ -156,7 +248,7 @@ class _AddOrderWithProductsScreenState
               ),
             ),
             const SizedBox(height: 15),
-        
+
             // Product and Save Buttons
             Row(
               children: [
@@ -185,7 +277,7 @@ class _AddOrderWithProductsScreenState
                   ),
                 ),
                 const SizedBox(width: 20), // Space between buttons
-        
+
                 // Save Order Button
                 ElevatedButton(
                   onPressed: saveOrderWithProducts,
@@ -209,7 +301,7 @@ class _AddOrderWithProductsScreenState
             const SizedBox(
               height: 10,
             ),
-        
+
             // Products Section with Horizontal Scrollable Table in Card
             Expanded(
               flex: 0,
@@ -245,7 +337,7 @@ class _AddOrderWithProductsScreenState
                               return DataRow(cells: [
                                 DataCell(Text('${index + 1}')), // Sr No.
                                 DataCell(Text(product['name'])),
-                                DataCell(Text('\$${product['price']}')),
+                                DataCell(Text('\₹ ${product['price']}')),
                                 DataCell(Text('${product['quantity']}')),
                                 DataCell(IconButton(
                                   icon: const Icon(Icons.delete,
@@ -272,7 +364,6 @@ class _AddOrderWithProductsScreenState
   }
 }
 
-
 class AddProductDialog extends StatefulWidget {
   final Function(String, double, int) onAddProduct;
 
@@ -285,7 +376,8 @@ class AddProductDialog extends StatefulWidget {
 class _AddProductDialogState extends State<AddProductDialog> {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productPriceController = TextEditingController();
-  final TextEditingController _productQuantityController = TextEditingController();
+  final TextEditingController _productQuantityController =
+      TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -335,7 +427,8 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     icon: Icons.attach_money,
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || double.tryParse(value.trim()) == null) {
+                      if (value == null ||
+                          double.tryParse(value.trim()) == null) {
                         return 'Enter a valid price';
                       }
                       return null;
@@ -368,14 +461,19 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     foregroundColor: Colors.grey.shade700,
                     textStyle: const TextStyle(fontSize: 16),
                   ),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.red, fontSize: 18),),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.red, fontSize: 18),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
                       final name = _productNameController.text.trim();
-                      final price = double.parse(_productPriceController.text.trim());
-                      final quantity = int.parse(_productQuantityController.text.trim());
+                      final price =
+                          double.parse(_productPriceController.text.trim());
+                      final quantity =
+                          int.parse(_productQuantityController.text.trim());
 
                       widget.onAddProduct(name, price, quantity);
                       Navigator.pop(context);
@@ -383,13 +481,18 @@ class _AddProductDialogState extends State<AddProductDialog> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  child: const Text('Add', style: TextStyle(color: Colors.white, fontSize: 20),),
+                  child: const Text(
+                    'Add',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
                 ),
               ],
             ),

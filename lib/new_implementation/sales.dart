@@ -479,7 +479,9 @@ class _SalesScreenState extends State<SalesScreen> {
                   );
                 }
                 final data = snapshot.data!.docs.where((doc) {
-                  return doc.id.toLowerCase().contains(searchQuery);
+                  // Filter out 'salesData' and apply search query
+                  return doc.id != 'salesData' &&
+                      doc.id.toLowerCase().contains(searchQuery);
                 }).toList();
 
                 return ListView.builder(

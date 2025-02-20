@@ -3,7 +3,8 @@ import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/ProfileScreen.dart';
 import 'package:firebase_connect/new_implementation/SplashScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
-import 'package:firebase_connect/new_implementation/manageStaff.dart';
+import 'package:firebase_connect/new_implementation/manageStaff/ManageStaffScreen.dart';
+// import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
 import 'package:firebase_connect/new_implementation/purchase.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           '/addSalesOwner': (context) => AddSalesOwnerScreen(),
           '/addProduct': (context) => AddProductScreen(orderPath: ''),
           '/categories': (context) => Categories(),
+          // '/managestaff': (context) => const ManageStaffScreen(),
           '/managestaff': (context) => const ManageStaffScreen(),
           '/profileUpdate': (context) => ProfileUpdatePage(),
           '/profileScreen': (context) => const ProfileScreenNew(),

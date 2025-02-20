@@ -179,34 +179,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           );
                         }).toList();
 
-                        // Provider.of<Logindetails>(context, listen: false)
-                        //     .setSalesAmt(priceSum);
-                        // final salesAmtSnapshot = await FirebaseFirestore
-                        //     .instance
-                        //     .collection('users')
-                        //     .doc(Provider.of<Logindetails>(context,
-                        //             listen: false)
-                        //         .userEmail)
-                        //     .get();
-
-                        // dynamic salesAmtFirebase =
-                        //     salesAmtSnapshot.get("salesAmt");
-
-                        // if (salesAmtFirebase is num) {
-                        //   salesAmtFirebase += priceSum;
-
-                        //   await FirebaseFirestore.instance
-                        //       .collection('users')
-                        //       .doc(Provider.of<Logindetails>(context,
-                        //               listen: false)
-                        //           .userEmail)
-                        //       .update({"salesAmt": salesAmtFirebase});
-
-                        //   log("Updated salesAmt: $salesAmtFirebase");
-                        // } else {
-                        //   log("salesAmt is not a number, cannot perform addition.");
-                        // }
-
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
                           log("$priceSum");
@@ -219,7 +191,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         }));
                       },
                       style: ElevatedButton.styleFrom(
-                        // minimumSize: const Size(double.infinity, 50),
                         backgroundColor: Colors.deepPurpleAccent,
                         textStyle: const TextStyle(fontSize: 16),
                         shape: RoundedRectangleBorder(

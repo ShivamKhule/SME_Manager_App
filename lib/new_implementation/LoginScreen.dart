@@ -128,8 +128,8 @@ class _LoginPageState extends State<LoginScreen> {
                                   userCredential.user!.uid,
                                   userCredential.user!.email!);
 
-                                  dynamic localData =  await DBHelper().getProfile();
-                                  log("#Local Data in Login Screen : $localData");
+                                  // dynamic localData =  await DBHelper().getProfile();
+                                  // log("#Local Data in Login Screen : $localData");
 
                               ToastService.showSuccessToast(
                                 context,

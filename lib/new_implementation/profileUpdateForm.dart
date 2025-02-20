@@ -32,10 +32,41 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
       city = "",
       pincode = "",
       selectedState = "",
-      selectedDistrict = "";
+      selectedDistrict = "",
+      profileImageUrl = "";
 
   Map<String, List<String>> stateDistricts = {
-    "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+    "Maharashtra": [
+      "Mumbai",
+      "Pune",
+      "Nagpur",
+      "Nashik",
+      "Thane",
+      "Aurangabad",
+      "Solapur",
+      "Amravati",
+      "Kolhapur",
+      "Nanded",
+      "Sangli",
+      "Jalgaon",
+      "Akola",
+      "Latur",
+      "Dhule",
+      "Ahmednagar",
+      "Chandrapur",
+      "Parbhani",
+      "Jalna",
+      "Bhiwandi",
+      "Ratnagiri",
+      "Satara",
+      "Beed",
+      "Wardha",
+      "Yavatmal",
+      "Osmanabad",
+      "Gondia",
+      "Hingoli",
+      "Washim"
+    ],
     "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
     "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
   };
@@ -193,69 +224,17 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         ));
   }
 
-  Future<String?> _uploadImageToFirebase(File imageFile) async {
-    // try {
-    //   String fileName =
-    //       "profile_images/${Provider.of<Logindetails>(context, listen: false).userEmail}.jpg";
-    //   Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
-    //   UploadTask uploadTask = storageRef.putFile(imageFile);
-    //   TaskSnapshot snapshot = await uploadTask;
-    //   return await snapshot.ref.getDownloadURL();
-    // } catch (e) {
-    //   return null;
-    // }
-  }
-
-  // Future<void> _saveDataToFirestore() async {
-  //   try {
-  //     uploadImage();
-
-  //     Map<String, dynamic> profileData = {
-  //       'company_name': companyNameController.text,
-  //       'owner_name': ownerNameController.text,
-  //       'gstin': gstinController.text,
-  //       'email': Provider.of<Logindetails>(context, listen: false).userEmail,
-  //       'mobile': mobileController.text,
-  //       'address': addressController.text,
-  //       'business_domain': businessDomainController.text,
-  //       'address_line1': addressLine1,
-  //       'address_line2': addressLine2,
-  //       'landmark': landmark,
-  //       'city': city,
-  //       'district': selectedDistrict,
-  //       'state': selectedState,
-  //       'pincode': pincode,
-  //       'profile_image': _imageUrl,
-  //     };
-
-  //     // Save to Firebase
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(Provider.of<Logindetails>(context, listen: false).userEmail)
-  //         .set(profileData);
-
-  //     await DBHelper().updateProfile(profileData);
-
-  //     Provider.of<Logindetails>(context, listen: false).setUserDetails(
-  //         companyNameController.text,
-  //         ownerNameController.text,
-  //         addressController.text,
-  //         mobileController.text,
-  //         gstinController.text,
-  //         _imageUrl!,
-  //         businessDomainController.text);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text("Profile updated successfully!")),
-  //     );
-  //     Navigator.of(context).pushReplacementNamed("/home");
-  //   } catch (e) {
-  //     log("Error: $e");
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Error: ${e.toString()}")),
-  //     );
-  //     print("Error: $e"); // Add this line to print the error to the console
-  //   }
+  // Future<String?> _uploadImageToFirebase(File imageFile) async {
+  // try {
+  //   String fileName =
+  //       "profile_images/${Provider.of<Logindetails>(context, listen: false).userEmail}.jpg";
+  //   Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+  //   UploadTask uploadTask = storageRef.putFile(imageFile);
+  //   TaskSnapshot snapshot = await uploadTask;
+  //   return await snapshot.ref.getDownloadURL();
+  // } catch (e) {
+  //   return null;
+  // }
   // }
 
   File? _imageFile;
@@ -392,35 +371,34 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         selectedDistrict = data['district'] ?? "";
         selectedState = data['state'] ?? "";
         pincode = data['pincode'] ?? "";
-        // profileImageUrl = data['profile_image'];
+        profileImageUrl = data['profile_image'];
       });
     }
     // Fetch from Local Database (SQFLite)
-    Map<String, dynamic>? localData = await DBHelper().getProfile();
-    if (localData != null) {
-      setState(() {
-        companyNameController.text = localData['company_name'] ?? "";
-        ownerNameController.text = localData['owner_name'] ?? "";
-        gstinController.text = localData['gstin'] ?? "";
-        mobileController.text = localData['mobile'] ?? "";
-        businessDomainController.text = localData['business_domain'] ?? "";
-        addressController.text = localData['address'] ?? "";
-        addressLine1 = localData['address_line1'] ?? "";
-        addressLine2 = localData['address_line2'] ?? "";
-        landmark = localData['landmark'] ?? "";
-        city = localData['city'] ?? "";
-        selectedDistrict = localData['district'] ?? "";
-        selectedState = localData['state'] ?? "";
-        pincode = localData['pincode'] ?? "";
-      });
-    }
+    // Map<String, dynamic>? localData = await DBHelper().getProfile();
+    // if (localData != null) {
+    //   setState(() {
+    //     companyNameController.text = localData['company_name'] ?? "";
+    //     ownerNameController.text = localData['owner_name'] ?? "";
+    //     gstinController.text = localData['gstin'] ?? "";
+    //     mobileController.text = localData['mobile'] ?? "";
+    //     businessDomainController.text = localData['business_domain'] ?? "";
+    //     addressController.text = localData['address'] ?? "";
+    //     addressLine1 = localData['address_line1'] ?? "";
+    //     addressLine2 = localData['address_line2'] ?? "";
+    //     landmark = localData['landmark'] ?? "";
+    //     city = localData['city'] ?? "";
+    //     selectedDistrict = localData['district'] ?? "";
+    //     selectedState = localData['state'] ?? "";
+    //     pincode = localData['pincode'] ?? "";
+    //   });
+    // }
   }
 
   @override
   void initState() {
     super.initState();
     _loadProfileData();
-    log("Cloudinary Image:- $_uploadedImageUrl");
   }
 
   @override
@@ -442,32 +420,53 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           child: SingleChildScrollView(
               child: Column(children: [
             GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                    decoration:
-                        const BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 6,
-                        spreadRadius: 2,
-                        offset: Offset(0, 3),
-                      )
-                    ]),
-                    child: CircleAvatar(
-                      radius: 65,
-                      backgroundColor: Colors.grey[300],
-                      // backgroundImage:
-                      //     _image != null ? FileImage(_image!) : null,
-                      backgroundImage: _uploadedImageUrl != null
-                          ? NetworkImage(_uploadedImageUrl!)
+              onTap: _pickImage,
+              child: Container(
+                decoration:
+                    const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    spreadRadius: 2,
+                    offset: Offset(0, 3),
+                  )
+                ]),
+                child: CircleAvatar(
+                  radius: 65,
+                  backgroundColor: Colors.grey[300],
+                  // backgroundImage:
+                  //     _image != null ? FileImage(_image!) : null,
+                  // backgroundImage: _uploadedImageUrl != null
+                  //     ? NetworkImage(_uploadedImageUrl!)
+                  //     : _imageFile != null
+                  //         ? FileImage(_imageFile!) as ImageProvider
+                  //         : null,
+                  // child: _imageFile == null
+                  //     ? Icon(Icons.camera_alt,
+                  //         color: Colors.grey[700], size: 40)
+                  //     : null,
+                  backgroundImage: _uploadedImageUrl != null
+                      ? NetworkImage(
+                          _uploadedImageUrl!) // Show new uploaded image URL first
+                      : profileImageUrl != null && profileImageUrl.isNotEmpty
+                          ? NetworkImage(
+                              profileImageUrl) // Then show existing profile image URL
                           : _imageFile != null
-                              ? FileImage(_imageFile!) as ImageProvider
-                              : null,
-                      child: _imageFile == null
-                          ? Icon(Icons.camera_alt,
-                              color: Colors.grey[700], size: 40)
-                          : null,
-                    ))),
+                              ? FileImage(_imageFile!)
+                                  as ImageProvider // Then show newly selected image
+                              : null, // No image if all are null
+                  child: _uploadedImageUrl == null &&
+                          profileImageUrl == null &&
+                          _imageFile == null
+                      ? Icon(
+                          Icons.camera_alt,
+                          color: Colors.grey[700],
+                          size: 40,
+                        )
+                      : null,
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             Container(
                 padding: const EdgeInsets.all(16),
