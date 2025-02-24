@@ -1,3 +1,4 @@
+import 'package:firebase_connect/new_implementation/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,6 +37,11 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             ),
           ),
         ),
+        leading: IconButton(onPressed: (){
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context){
+            return HomeScreen();
+          }), (route)=>false);
+        }, icon: const Icon(Icons.arrow_back)),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -54,7 +60,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-            
+
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
@@ -69,7 +75,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
               itemBuilder: (context, index) {
                 final doc = snapshot.data!.docs[index];
                 final data = doc.data() as Map<String, dynamic>;
-                
+
                 return _buildStaffCard(
                   docId: doc.id,
                   name: data['name'] ?? '',
@@ -94,7 +100,11 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
           }
         },
         backgroundColor: const Color(0xFF6A11CB),
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 32,
+        ),
       ),
     );
   }

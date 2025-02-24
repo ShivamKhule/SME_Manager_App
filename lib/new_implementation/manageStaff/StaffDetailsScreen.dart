@@ -46,7 +46,8 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
       setState(() {
         salary = (doc['salary'] ?? 0.0).toDouble();
         paidAmount = (doc['paidAmount'] ?? 0.0).toDouble();
-        paymentHistory = List<Map<String, dynamic>>.from(doc['paymentHistory'] ?? []);
+        paymentHistory =
+            List<Map<String, dynamic>>.from(doc['paymentHistory'] ?? []);
       });
     }
   }
@@ -106,7 +107,8 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Confirm Delete'),
-                  content: const Text('Are you sure you want to delete this staff member?'),
+                  content: const Text(
+                      'Are you sure you want to delete this staff member?'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -117,7 +119,8 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                         _deleteStaff();
                         Navigator.pop(context);
                       },
-                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      child: const Text('Delete',
+                          style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),
@@ -211,12 +214,20 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Edit Profile'),
+                        child: const Text(
+                          'Edit Profile',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 15),
-                  _buildInfoRow('Total Salary', '\₹ ${salary.toStringAsFixed(2)}'),
+                  _buildInfoRow(
+                      'Total Salary', '\₹ ${salary.toStringAsFixed(2)}'),
                   _buildInfoRow('Paid', '\₹ ${paidAmount.toStringAsFixed(2)}'),
                   _buildInfoRow(
                     'Pending',
@@ -227,19 +238,6 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                   _buildModernTextField(
                     label: 'Update Salary',
                     onSubmitted: _updateSalary,
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add your salary update logic here if needed
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[400],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Update'),
                   ),
                   const SizedBox(height: 15),
                   _buildModernTextField(
@@ -295,10 +293,17 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                               contentPadding: EdgeInsets.zero,
                               title: Text(
                                 '\₹ ${payment['amount'].toStringAsFixed(2)}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(
-                                DateFormat('MMM dd, yyyy').format(payment['date']),
+                                DateFormat('MMM dd, yyyy').format(
+                                  payment['date'] is Timestamp
+                                      ? (payment['date'] as Timestamp)
+                                          .toDate() // Convert Timestamp to DateTime
+                                      : payment['date']
+                                          as DateTime, // Already DateTime, use directly
+                                ),
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               trailing: Icon(
@@ -375,7 +380,8 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {Color color = Colors.black}) {
+  Widget _buildInfoRow(String label, String value,
+      {Color color = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -407,7 +413,8 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       ),
       keyboardType: TextInputType.number,
       onFieldSubmitted: onSubmitted,

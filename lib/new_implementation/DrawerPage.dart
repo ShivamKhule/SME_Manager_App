@@ -5,7 +5,7 @@ import 'package:firebase_connect/controller/LoginDetails.dart';
 import 'package:firebase_connect/db_helper.dart';
 import 'package:firebase_connect/new_implementation/LoginScreen.dart';
 import 'package:firebase_connect/new_implementation/dashboard.dart';
-import 'package:firebase_connect/new_implementation/manageStaff/ManageStaffScreen.dart';
+import 'package:firebase_connect/new_implementation/manageStaff/ManageStaffList.dart';
 // import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

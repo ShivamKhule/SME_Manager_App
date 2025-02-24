@@ -149,6 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
     //     .doc(
     //         'users/${Provider.of<Logindetails>(context).userEmail}/sales/salesData')
     //     .get();
+    
+  }
+
+  void getSalesData() async{
     try {
       final salesData = await FirebaseFirestore.instance
           .collection('users')
@@ -156,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .collection('sales')
           .doc('salesData')
           .get();
-      salesAmt = salesData.exists ? salesData.get('salesAmt') : null;
+      salesAmt = salesData.exists ? salesData.get('salesAmt') : "0.0";
     } catch (e) {
       print('Error fetching sales data: $e');
     }
@@ -169,6 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getProfileDetails();
+    getSalesData();
     profileData();
   }
 
