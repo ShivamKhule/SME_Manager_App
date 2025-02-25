@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firebase Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StaffDetailsScreen extends StatefulWidget {
   final String name;
   final String role;
   final String phone;
-  final String staffId; // Add staffId to identify document in Firestore
+  final String staffId;
 
   const StaffDetailsScreen({
     Key? key,
@@ -78,6 +78,63 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
       'role': _roleController.text,
       'phone': _phoneController.text,
     });
+  }
+
+  // New method to remove a payment
+  Future<void> _removePayment(int index) async {
+    // Get the payment to be removed
+    final payment = paymentHistory[index];
+    final amountToRemove = payment['amount'].toDouble();
+    
+    // Show confirmation dialog
+    final shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Undo Payment'),
+        content: Text(
+          'Are you sure you want to remove the payment of ₹${amountToRemove.toStringAsFixed(2)}?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    ) ?? false;
+
+    if (!shouldRemove) return;
+
+    // Update local state
+    setState(() {
+      // Remove the payment from history
+      paymentHistory.removeAt(index);
+      // Subtract the amount from total paid
+      paidAmount -= amountToRemove;
+      if (paidAmount < 0) paidAmount = 0; // Ensure we don't go negative
+    });
+
+    // Update Firestore
+    await FirebaseFirestore.instance
+        .collection('staff')
+        .doc(widget.staffId)
+        .update({
+      'paidAmount': paidAmount,
+      'paymentHistory': paymentHistory,
+    });
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Payment of ₹${amountToRemove.toStringAsFixed(2)} removed'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -289,26 +346,72 @@ class _StaffDetailsScreenState extends State<StaffDetailsScreen> {
                           itemCount: paymentHistory.length,
                           itemBuilder: (context, index) {
                             final payment = paymentHistory[index];
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(
-                                '\₹ ${payment['amount'].toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Text(
-                                DateFormat('MMM dd, yyyy').format(
-                                  payment['date'] is Timestamp
-                                      ? (payment['date'] as Timestamp)
-                                          .toDate() // Convert Timestamp to DateTime
-                                      : payment['date']
-                                          as DateTime, // Already DateTime, use directly
+                            return Dismissible(
+                              key: Key('payment_${index}_${payment['amount']}'),
+                              background: Container(
+                                color: Colors.red[400],
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                child: const Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
                                 ),
-                                style: TextStyle(color: Colors.grey[600]),
                               ),
-                              trailing: Icon(
-                                Icons.check_circle,
-                                color: Colors.green[400],
+                              direction: DismissDirection.endToStart,
+                              confirmDismiss: (direction) async {
+                                return await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Undo Payment'),
+                                    content: Text(
+                                      'Are you sure you want to remove this payment of ₹${payment['amount'].toStringAsFixed(2)}?'
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, true),
+                                        child: const Text('Remove', style: TextStyle(color: Colors.red)),
+                                      ),
+                                    ],
+                                  ),
+                                ) ?? false;
+                              },
+                              onDismissed: (direction) {
+                                _removePayment(index);
+                              },
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  '\₹ ${payment['amount'].toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text(
+                                  DateFormat('MMM dd, yyyy').format(
+                                    payment['date'] is Timestamp
+                                        ? (payment['date'] as Timestamp)
+                                            .toDate()
+                                        : payment['date'] as DateTime,
+                                  ),
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green[400],
+                                    ),
+                                    const SizedBox(width: 10),
+                                    IconButton(
+                                      icon: const Icon(Icons.undo, color: Colors.red),
+                                      onPressed: () => _removePayment(index),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },

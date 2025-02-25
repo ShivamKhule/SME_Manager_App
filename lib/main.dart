@@ -4,7 +4,6 @@ import 'package:firebase_connect/new_implementation/ProfileScreen.dart';
 import 'package:firebase_connect/new_implementation/SplashScreen.dart';
 import 'package:firebase_connect/new_implementation/categories.dart';
 import 'package:firebase_connect/new_implementation/manageStaff/ManageStaffList.dart';
-// import 'package:firebase_connect/new_implementation/manageStaff.dart';
 import 'package:firebase_connect/new_implementation/profileUpdateForm.dart';
 import 'package:firebase_connect/new_implementation/purchase.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +46,6 @@ class MyApp extends StatelessWidget {
           '/addSalesOwner': (context) => AddSalesOwnerScreen(),
           '/addProduct': (context) => AddProductScreen(orderPath: ''),
           '/categories': (context) => Categories(),
-          // '/managestaff': (context) => const ManageStaffScreen(),
           '/managestaff': (context) => const ManageStaffScreen(),
           '/profileUpdate': (context) => ProfileUpdatePage(),
           '/profileScreen': (context) => const ProfileScreenNew(),
@@ -56,28 +54,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// import 'package:firebase_connect/SME_Manager/HomePage.dart';
-// import 'package:firebase_connect/SME_Manager/LoginPage.dart';
-// import 'package:flutter/material.dart';
-// import 'package:firebase_core/firebase_core.dart';
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
-
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       // home: AuthScreen(),
-//       home: Homepage()
-//     );
-//   }
-// }
